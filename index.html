@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天记录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header .date-range {
+            font-size: 14px;
+            color: #bbbbbb;
+        }
+        .record {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .record .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px; /* 圆角处理，使头像为正方形并带有圆角 */
+            margin-right: 15px;
+        }
+        .record .content {
+            flex-grow: 1;
+        }
+        .record .user {
+            font-size: 16px;
+            color: #bbbbbb;
+            margin-bottom: 5px;
+        }
+        .record .time {
+            font-size: 12px;
+            color: #777777;
+            text-align: right;
+        }
+        .record .numbers {
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        .no-avatar .content {
+            margin-left: 65px; /* 为了和有头像的消息对齐 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>你是好人的聊天记录</h1>
+    <div class="date-range">2024年8月5日至2024年8月6日</div>
+</div>
+
+<div id="records-container"></div>
+
+<script>
+    function loadRecords() {
+        fetch('/api/records')
+            .then(response => response.json())
+            .then(records => {
+                const container = document.getElementById('records-container');
+                container.innerHTML = ''; // 清空容器内容
+
+                let lastUser = ''; // 记录上一个消息的用户名
+
+                records.forEach(record => {
+                    const recordDiv = document.createElement('div');
+                    recordDiv.className = 'record';
+
+                    // 判断是否显示头像
+                    if (record.user !== lastUser) {
+                        const avatarImg = document.createElement('img');
+                        avatarImg.className = 'avatar';
+                        avatarImg.src = record.avatar; // 设置头像图片URL
+                        recordDiv.appendChild(avatarImg);
+                    } else {
+                        recordDiv.classList.add('no-avatar'); // 如果没有头像，添加一个类来处理对齐问题
+                    }
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'content';
+
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user';
+                    userDiv.innerText = record.user;
+
+                    const numbersDiv = document.createElement('div');
+                    numbersDiv.className = 'numbers';
+                    numbersDiv.innerText = record.numbers;
+
+                    const timeDiv = document.createElement('div');
+                    timeDiv.className = 'time';
+                    timeDiv.innerText = record.time;
+
+                    contentDiv.appendChild(userDiv);
+                    contentDiv.appendChild(numbersDiv);
+                    contentDiv.appendChild(timeDiv);
+
+                    recordDiv.appendChild(contentDiv);
+                    container.appendChild(recordDiv);
+
+                    // 更新 lastUser 以记录当前的用户名
+                    lastUser = record.user;
+                });
+            });
+    }
+
+    // 页面加载完成后加载记录
+    document.addEventListener('DOMContentLoaded', loadRecords);
+</script>
+
+</body>
+</html>
