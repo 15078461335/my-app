@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #1c1c1c;
-            color: #ffffff;
+            background-color: #ffffff;
+            color: #000000;
             margin: 0;
             padding: 20px;
         }
@@ -19,42 +19,49 @@
         .header h1 {
             margin: 0;
             font-size: 24px;
+            color: #000000;
         }
         .header .date-range {
             font-size: 14px;
-            color: #bbbbbb;
+            color: #555555;
         }
         .record {
-            margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
+            padding-bottom: 20px;
+            position: relative;
         }
         .record .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px; /* 圆角处理，使头像为正方形并带有圆角 */
-            margin-right: 15px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-right: 10px;
         }
         .record .content {
             flex-grow: 1;
+            border-bottom: 0.3px solid #d3d3d3; /* 淡灰色的分隔线 */
+            padding-bottom: 10px; /* 分隔线和内容之间的间距 */
         }
         .record .user {
             font-size: 16px;
-            color: #bbbbbb;
+            color: #333333;
             margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .record .time {
             font-size: 12px;
             color: #777777;
-            text-align: right;
         }
         .record .numbers {
             font-size: 14px;
             line-height: 1.6;
-            white-space: pre-wrap;
+            white-space: nowrap;
+            color: #000000;
         }
         .no-avatar .content {
-            margin-left: 65px; /* 为了和有头像的消息对齐 */
+            margin-left: 50px; /* 为了和有头像的消息对齐 */
         }
     </style>
 </head>
@@ -77,7 +84,7 @@
 
                 let lastUser = ''; // 记录上一个消息的用户名
 
-                records.forEach(record => {
+                records.forEach((record, index) => {
                     const recordDiv = document.createElement('div');
                     recordDiv.className = 'record';
 
@@ -96,19 +103,17 @@
 
                     const userDiv = document.createElement('div');
                     userDiv.className = 'user';
-                    userDiv.innerText = record.user;
+                    userDiv.innerHTML = `
+                        <span>${record.user}</span>
+                        <span class="time">${record.time}</span>
+                    `;
 
                     const numbersDiv = document.createElement('div');
                     numbersDiv.className = 'numbers';
                     numbersDiv.innerText = record.numbers;
 
-                    const timeDiv = document.createElement('div');
-                    timeDiv.className = 'time';
-                    timeDiv.innerText = record.time;
-
                     contentDiv.appendChild(userDiv);
                     contentDiv.appendChild(numbersDiv);
-                    contentDiv.appendChild(timeDiv);
 
                     recordDiv.appendChild(contentDiv);
                     container.appendChild(recordDiv);
