@@ -1,70 +1,68 @@
-<!DOCTYPE html> <!-- 声明文档类型为HTML5 -->
-<html lang="en"> <!-- 定义文档的语言为英语 -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8"> <!-- 设置字符编码为UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 视口设置，确保页面在移动设备上正确缩放 -->
-    <title>聊天记录</title> <!-- 页面标题，显示在浏览器标签页上 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>忘词和大兜兜的聊天记录</title>
     <style>
         body {
-            font-family: Arial, sans-serif; /* 设置全局字体为 Arial，或默认 sans-serif */
-            background-color: #ffffff; /* 设置背景颜色为白色 */
-            color: #000000; /* 设置文本颜色为黑色 */
-            margin: 0; /* 清除 body 元素的默认外边距 */
-            padding: 20px; /* 给 body 元素添加20px的内边距 */
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 20px;
         }
         .record {
-            display: flex; /* 使用弹性布局，将子元素水平排列 */
-            align-items: flex-start; /* 子元素在交叉轴（垂直方向）上起始对齐 */
-            padding-bottom: 20px; /* 给每个记录元素添加20px的底部内边距 */
-            position: relative; /* 设置为相对定位，以便后续使用绝对定位 */
+            display: flex;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            position: relative;
         }
         .record .avatar {
-            width: 40px; /* 设置头像宽度为40px */
-            height: 40px; /* 设置头像高度为40px */
-            border-radius: 8px; /* 将头像的四个角设置为8px的圆角 */
-            margin-right: 10px; /* 在头像右侧添加10px的外边距 */
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-right: 10px;
         }
         .record .content {
-            flex-grow: 1; /* 让内容区域在可用空间中尽可能扩大 */
-            border-bottom: 0.3px solid #d3d3d3; /* 在内容区域的底部添加0.3px的淡灰色分隔线 */
-            padding-bottom: 10px; /* 在内容区域底部添加10px的内边距，避免文本紧贴分隔线 */
+            flex-grow: 1;
+            border-bottom: 0.3px solid #d3d3d3; /* 淡灰色的分隔线 */
+            padding-bottom: 10px; /* 分隔线和内容之间的间距 */
         }
         .record .user {
-            font-size: 16px; /* 设置用户名文本的字体大小为16px */
-            color: #333333; /* 设置用户名文本颜色为深灰色 */
-            margin-bottom: 5px; /* 在用户名文本底部添加5px的外边距 */
-            display: flex; /* 使用弹性布局，将用户名和时间放在同一行 */
-            justify-content: space-between; /* 在水平轴上将用户名和时间分散对齐 */
-            align-items: center; /* 在垂直方向上将用户名和时间居中对齐 */
+            font-size: 16px;
+            color: #333333;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .record .time {
-            font-size: 12px; /* 设置时间文本的字体大小为12px */
-            color: #777777; /* 设置时间文本的颜色为灰色 */
+            font-size: 12px;
+            color: #777777;
         }
         .record .numbers {
-            font-size: 14px; /* 设置消息内容文本的字体大小为14px */
-            line-height: 1.6; /* 设置文本的行高为1.6倍字体大小，增加可读性 */
-            white-space: pre-wrap; /* 保持文本中的空格和换行符，自动换行 */
-            color: #000000; /* 设置消息内容文本颜色为黑色 */
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #000000;
         }
         .no-avatar .content {
-            margin-left: 50px; /* 如果没有头像，给内容区域添加50px的左侧内边距，使其与有头像的消息对齐 */
+            margin-left: 50px; /* 为了和有头像的消息对齐 */
         }
     </style>
 </head>
 <body>
 
-<!-- 主体内容，包含聊天记录 -->
-<div id="records-container"></div> <!-- 这是将要填充聊天记录的容器 -->
+<div id="records-container"></div>
 
 <script>
     function loadRecords() {
-        // 发送请求以获取聊天记录
         fetch('/api/records')  // 从指定的 API 端点获取 JSON 数据
             .then(response => response.json()) // 解析响应为 JSON 对象
-            .then(records => { // 使用获取的记录数据
+            .then(records => {
                 const container = document.getElementById('records-container'); // 获取记录容器的引用
-                container.innerHTML = ''; // 清空容器内容，以便插入新的记录
+                container.innerHTML = ''; // 清空容器内容
 
                 let lastUser = ''; // 用于存储上一个消息发送者的用户名
 
@@ -73,7 +71,7 @@
                     recordDiv.className = 'record'; // 为这个 div 设置类名为 'record'
 
                     // 判断是否需要显示头像
-                    if (record.user !== lastUser) { // 如果当前消息发送者与上一个不同
+                    if (record.user !== lastUser) {
                         const avatarImg = document.createElement('img'); // 创建一个 img 元素用于显示头像
                         avatarImg.className = 'avatar'; // 为头像设置类名为 'avatar'
                         avatarImg.src = record.avatar; // 设置头像的图片 URL
