@@ -50,11 +50,18 @@
         .no-avatar .content {
             margin-left: 50px; /* 为了和有头像的消息对齐 */
         }
+        .extra-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333333;
+        }
     </style>
 </head>
 <body>
 
 <div id="records-container"></div>
+
+<p class="extra-text">今天天气很好。</p> <!-- 在聊天记录下面添加额外的文本 -->
 
 <script>
     function loadRecords() {
