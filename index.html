@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>忘词和大兜兜的聊天记录</title>
+    
+    <!-- 微信分享时，优先抓取这些 meta 标签的内容 -->
+    <meta property="og:title" content="新澳 219 期">
+    <meta property="og:description" content="三中三：06-34-28, 三中三：35-29-30. 今天天气很好。">
+    <meta name="description" content="新澳 219 期，三中三：06-34-28, 三中三：35-29-30. 今天天气很好。">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,18 +56,19 @@
         .no-avatar .content {
             margin-left: 50px; /* 为了和有头像的消息对齐 */
         }
-        .extra-text {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #333333;
-        }
     </style>
 </head>
 <body>
 
-<div id="records-container"></div>
+    <!-- 这里可以添加你希望在微信预览中显示的内容 -->
+    <div class="preview">
+        <h1>新澳 219 期</h1>
+        <p>三中三：06-34-28</p>
+        <p>三中三：35-29-30</p>
+        <p>今天天气很好。</p>
+    </div>
 
-<p class="extra-text">今天天气很好哈还hihi湖还是地回复后速度合法iu阿山地手打好。</p> <!-- 在聊天记录下面添加额外的文本 -->
+    <div id="records-container"></div>
 
 <script>
     function loadRecords() {
