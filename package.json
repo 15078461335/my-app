@@ -1,10 +1,9 @@
 {
-    "name": "my-app",
-    "version": "1.0.0",
-    "main": "server.js",
-    "scripts": {
-      "start": "nodemon server.js"
-        },
-    "dependencies": {}
-  }
-  
+  "name": "my-app",
+  "version": "1.0.1",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "dependencies": {}
+}
