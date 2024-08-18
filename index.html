@@ -1,131 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <!-- 声明文档类型为HTML5 -->
+<html lang="en"> <!-- 定义文档的语言为英语 -->
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>你是好人的聊天记录</title>
-    <div class="date-range">2024年8月5日至2024年8月6日</div>
+    <meta charset="UTF-8"> <!-- 设置字符编码为UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 视口设置，确保页面在移动设备上正确缩放 -->
+    <title>聊天记录</title> <!-- 页面标题，显示在浏览器标签页上 -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            color: #000000;
-            margin: 0;
-            padding: 20px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #000000;
-        }
-        .header .date-range {
-            font-size: 14px;
-            color: #555555;
+            font-family: Arial, sans-serif; /* 设置全局字体为 Arial，或默认 sans-serif */
+            background-color: #ffffff; /* 设置背景颜色为白色 */
+            color: #000000; /* 设置文本颜色为黑色 */
+            margin: 0; /* 清除 body 元素的默认外边距 */
+            padding: 20px; /* 给 body 元素添加20px的内边距 */
         }
         .record {
-            display: flex;
-            align-items: flex-start;
-            padding-bottom: 20px;
-            position: relative;
+            display: flex; /* 使用弹性布局，将子元素水平排列 */
+            align-items: flex-start; /* 子元素在交叉轴（垂直方向）上起始对齐 */
+            padding-bottom: 20px; /* 给每个记录元素添加20px的底部内边距 */
+            position: relative; /* 设置为相对定位，以便后续使用绝对定位 */
         }
         .record .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            margin-right: 10px;
+            width: 40px; /* 设置头像宽度为40px */
+            height: 40px; /* 设置头像高度为40px */
+            border-radius: 8px; /* 将头像的四个角设置为8px的圆角 */
+            margin-right: 10px; /* 在头像右侧添加10px的外边距 */
         }
         .record .content {
-            flex-grow: 1;
-            border-bottom: 0.3px solid #d3d3d3; /* 淡灰色的分隔线 */
-            padding-bottom: 10px; /* 分隔线和内容之间的间距 */
+            flex-grow: 1; /* 让内容区域在可用空间中尽可能扩大 */
+            border-bottom: 0.3px solid #d3d3d3; /* 在内容区域的底部添加0.3px的淡灰色分隔线 */
+            padding-bottom: 10px; /* 在内容区域底部添加10px的内边距，避免文本紧贴分隔线 */
         }
         .record .user {
-            font-size: 16px;
-            color: #333333;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 16px; /* 设置用户名文本的字体大小为16px */
+            color: #333333; /* 设置用户名文本颜色为深灰色 */
+            margin-bottom: 5px; /* 在用户名文本底部添加5px的外边距 */
+            display: flex; /* 使用弹性布局，将用户名和时间放在同一行 */
+            justify-content: space-between; /* 在水平轴上将用户名和时间分散对齐 */
+            align-items: center; /* 在垂直方向上将用户名和时间居中对齐 */
         }
         .record .time {
-            font-size: 12px;
-            color: #777777;
+            font-size: 12px; /* 设置时间文本的字体大小为12px */
+            color: #777777; /* 设置时间文本的颜色为灰色 */
         }
         .record .numbers {
-            font-size: 14px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            color: #000000;
+            font-size: 14px; /* 设置消息内容文本的字体大小为14px */
+            line-height: 1.6; /* 设置文本的行高为1.6倍字体大小，增加可读性 */
+            white-space: pre-wrap; /* 保持文本中的空格和换行符，自动换行 */
+            color: #000000; /* 设置消息内容文本颜色为黑色 */
         }
         .no-avatar .content {
-            margin-left: 50px; /* 为了和有头像的消息对齐 */
+            margin-left: 50px; /* 如果没有头像，给内容区域添加50px的左侧内边距，使其与有头像的消息对齐 */
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>你是好人的聊天记录</h1>
-    <div class="date-range">2024年8月5日至2024年8月6日</div>
-</div>
-
-<div id="records-container"></div>
+<!-- 主体内容，包含聊天记录 -->
+<div id="records-container"></div> <!-- 这是将要填充聊天记录的容器 -->
 
 <script>
     function loadRecords() {
-        fetch('/api/records')
-            .then(response => response.json())
-            .then(records => {
-                const container = document.getElementById('records-container');
-                container.innerHTML = ''; // 清空容器内容
+        // 发送请求以获取聊天记录
+        fetch('/api/records')  // 从指定的 API 端点获取 JSON 数据
+            .then(response => response.json()) // 解析响应为 JSON 对象
+            .then(records => { // 使用获取的记录数据
+                const container = document.getElementById('records-container'); // 获取记录容器的引用
+                container.innerHTML = ''; // 清空容器内容，以便插入新的记录
 
-                let lastUser = ''; // 记录上一个消息的用户名
+                let lastUser = ''; // 用于存储上一个消息发送者的用户名
 
-                records.forEach((record, index) => {
-                    const recordDiv = document.createElement('div');
-                    recordDiv.className = 'record';
+                records.forEach((record, index) => { // 遍历每一条记录
+                    const recordDiv = document.createElement('div'); // 创建一个新的 div 元素，用于表示一条记录
+                    recordDiv.className = 'record'; // 为这个 div 设置类名为 'record'
 
-                    // 判断是否显示头像
-                    if (record.user !== lastUser) {
-                        const avatarImg = document.createElement('img');
-                        avatarImg.className = 'avatar';
-                        avatarImg.src = record.avatar; // 设置头像图片URL
-                        recordDiv.appendChild(avatarImg);
+                    // 判断是否需要显示头像
+                    if (record.user !== lastUser) { // 如果当前消息发送者与上一个不同
+                        const avatarImg = document.createElement('img'); // 创建一个 img 元素用于显示头像
+                        avatarImg.className = 'avatar'; // 为头像设置类名为 'avatar'
+                        avatarImg.src = record.avatar; // 设置头像的图片 URL
+                        recordDiv.appendChild(avatarImg); // 将头像 img 元素添加到记录 div 中
                     } else {
-                        recordDiv.classList.add('no-avatar'); // 如果没有头像，添加一个类来处理对齐问题
+                        recordDiv.classList.add('no-avatar'); // 如果消息发送者相同，则给记录 div 添加 'no-avatar' 类
                     }
 
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'content';
+                    const contentDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
+                    contentDiv.className = 'content'; // 为内容 div 设置类名为 'content'
 
-                    const userDiv = document.createElement('div');
-                    userDiv.className = 'user';
+                    const userDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示用户名和时间
+                    userDiv.className = 'user'; // 为用户名 div 设置类名为 'user'
                     userDiv.innerHTML = `
-                        <span>${record.user}</span>
-                        <span class="time">${record.time}</span>
+                        <span>${record.user}</span> <!-- 显示消息发送者的用户名 -->
+                        <span class="time">${record.time}</span> <!-- 显示消息的发送时间 -->
                     `;
 
-                    const numbersDiv = document.createElement('div');
-                    numbersDiv.className = 'numbers';
-                    numbersDiv.innerText = record.numbers;
+                    const numbersDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
+                    numbersDiv.className = 'numbers'; // 为消息内容 div 设置类名为 'numbers'
+                    numbersDiv.innerText = record.numbers; // 将消息内容文本设置为记录中的 numbers 属性
 
-                    contentDiv.appendChild(userDiv);
-                    contentDiv.appendChild(numbersDiv);
+                    contentDiv.appendChild(userDiv); // 将用户名和时间 div 添加到内容 div 中
+                    contentDiv.appendChild(numbersDiv); // 将消息内容 div 添加到内容 div 中
 
-                    recordDiv.appendChild(contentDiv);
-                    container.appendChild(recordDiv);
+                    recordDiv.appendChild(contentDiv); // 将内容 div 添加到记录 div 中
+                    container.appendChild(recordDiv); // 将完整的记录 div 添加到容器中
 
-                    // 更新 lastUser 以记录当前的用户名
+                    // 更新 lastUser 为当前消息的发送者用户名
                     lastUser = record.user;
                 });
             });
     }
 
-    // 页面加载完成后加载记录
+    // 当页面加载完成后，调用 loadRecords 函数加载聊天记录
     document.addEventListener('DOMContentLoaded', loadRecords);
 </script>
 
