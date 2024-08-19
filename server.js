@@ -28,36 +28,66 @@ let chatRecords = [
 
 // 创建一个HTTP服务器
 const server = http.createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/') {
-    fs.readFile(path.join(__dirname, 'index.html'), (err, content) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Server Error');
+  // 处理请求的URL和方法
+  const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  const extname = path.extname(filePath);
+  let contentType = 'text/html';
+
+  // 根据文件扩展名设置Content-Type
+  switch (extname) {
+    case '.js':
+      contentType = 'text/javascript';
+      break;
+    case '.css':
+      contentType = 'text/css';
+      break;
+    case '.json':
+      contentType = 'application/json';
+      break;
+    case '.jpg':
+    case '.jpeg':
+      contentType = 'image/jpeg';
+      break;
+    case '.png':
+      contentType = 'image/png';
+      break;
+    case '.ico':
+      contentType = 'image/x-icon';
+      break;
+    default:
+      contentType = 'text/html';
+      break;
+  }
+
+  // 读取文件并返回响应
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      if (err.code == 'ENOENT') {
+        // 如果文件不存在，返回404
+        fs.readFile(path.join(__dirname, '404.html'), (error, content404) => {
+          res.writeHead(404, { 'Content-Type': 'text/html' });
+          res.end(content404, 'utf-8');
+        });
       } else {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(content);
+        // 处理其他错误
+        res.writeHead(500);
+        res.end(`Server Error: ${err.code}`);
       }
-    });
-  } else if (req.method === 'GET' && req.url.startsWith('/images/')) {
-    // 提供静态图片文件服务
-    fs.readFile(path.join(__dirname, req.url), (err, content) => {
-      if (err) {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Image Not Found');
-      } else {
-        res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-        res.end(content);
-      }
-    });
-  } else if (req.method === 'GET' && req.url === '/api/records') {
+    } else {
+      // 成功读取文件，返回内容
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
+  });
+
+  // API 路径处理
+  if (req.method === 'GET' && req.url === '/api/records') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(chatRecords));
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
   }
 });
 
+// 设置端口并启动服务器
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
