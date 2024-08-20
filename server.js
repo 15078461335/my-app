@@ -10,7 +10,9 @@ const { baseUrl } = require('./config');
 // 动态加载对应的data文件
 function getShareConfigById(id) {
     try {
-        const shareConfig = require(`./alldata/data_${id}.js`); // 加载带有完整名称的文件
+        // 根据你的文件命名规则，动态构建文件名
+        const fileName = `data_20240820_${id}.js`; // 你可以根据实际的日期来修改 '20240820'
+        const shareConfig = require(`./alldata/${fileName}`);
         return shareConfig;
     } catch (error) {
         console.error(`Failed to load data file for id: ${id}`, error);
