@@ -36,12 +36,13 @@ const server = http.createServer((req, res) => {
   // 微信服务器验证请求
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
     const { signature, timestamp, nonce, echostr } = new URL(req.url, `http://${req.headers.host}`).searchParams;
-
     const hash = crypto.createHash('sha1');
     const arr = [TOKEN, timestamp, nonce].sort();
     hash.update(arr.join(''));
 
     const sha1 = hash.digest('hex');
+    console.log('Received signature:', signature);
+    console.log('Calculated signature:', sha1);
 
     if (sha1 === signature) {
       res.end(echostr); // 验证成功，返回echostr
