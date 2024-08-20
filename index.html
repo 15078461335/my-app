@@ -14,12 +14,6 @@
     <link rel="icon" href="images/zhandianIcon.jpg" type="image/jpeg">
     <link rel="shortcut icon" href="images/zhandianIcon.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="images/zhandianIcon.jpg">
-    <meta property="og:image" content="images/zhandianIcon.jpg">
-
-    <!-- 微信分享时抓取的预览内容 -->
-    <meta property="og:title" content="">
-    <meta property="og:description" content="">
-    <meta name="description" content="">
 
     <!-- 引入微信JSSDK -->
     <script src="https://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
@@ -104,16 +98,17 @@
 </div>
 
 <script>
+    // 从API获取数据并渲染页面
     function loadRecords() {
         fetch('/api/records')  // 从指定的 API 端点获取 JSON 数据
             .then(response => response.json()) // 解析响应为 JSON 对象
-            .then(records => {
+            .then(data => {
                 const container = document.getElementById('records-container'); // 获取记录容器的引用
                 container.innerHTML = ''; // 清空容器内容
 
                 let lastUser = ''; // 用于存储上一个消息发送者的用户名
 
-                records.forEach((record, index) => { // 遍历每一条记录
+                data.forEach((record, index) => { // 遍历每一条记录
                     const recordDiv = document.createElement('div'); // 创建一个新的 div 元素，用于表示一条记录
                     recordDiv.className = 'record'; // 为这个 div 设置类名为 'record'
 
@@ -150,45 +145,44 @@
                     // 更新 lastUser 为当前消息的发送者用户名
                     lastUser = record.user;
                 });
+
+                // 更新微信分享内容
+                updateWeChatShareData(data);
             });
     }
 
-    // 当页面加载完成后，调用 loadRecords 函数加载聊天记录
-    document.addEventListener('DOMContentLoaded', loadRecords);
+    // 动态更新微信分享内容
+    function updateWeChatShareData(data) {
+        if (data.length > 0) {
+            const shareConfig = data[0]; // 假设使用第一个记录的数据
 
-    // 微信JSSDK初始化和自定义分享代码
-    fetch('/get-signature?url=' + encodeURIComponent(window.location.href))
-        .then(response => response.json())
-        .then(data => {
             wx.config({
-                debug: false, // 开启调试模式
-                appId: data.appId, // 必填，公众号的唯一标识
-                timestamp: data.timestamp, // 必填，生成签名的时间戳
-                nonceStr: data.nonceStr, // 必填，生成签名的随机串
-                signature: data.signature, // 必填，签名
-                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] // 选择您需要的JS接口
+                debug: false,
+                appId: 'wxda3ef9577ba6c47a',
+                timestamp: Math.floor(Date.now() / 1000), // 当前时间戳
+                nonceStr: 'randomString', // 随机字符串
+                signature: '', // 签名需要通过调用获取
+                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData']
             });
 
             wx.ready(function () {
-                // 自定义分享给朋友的内容
                 wx.updateAppMessageShareData({
-                    title: '', // 分享标题
-                    desc: '', // 分享描述
-                    link: window.location.href, // 分享链接
-                    imgUrl: '' // 分享图标
+                    title: shareConfig.title,
+                    desc: shareConfig.description,
+                    link: shareConfig.link,
+                    imgUrl: shareConfig.imgUrl
                 });
 
-                // 自定义分享到朋友圈的内容
                 wx.updateTimelineShareData({
-                    title: '', // 分享标题
-                    link: window.location.href, // 分享链接
-                    imgUrl: '' // 分享图标
+                    title: shareConfig.title,
+                    link: shareConfig.link,
+                    imgUrl: shareConfig.imgUrl
                 });
             });
-        })
-        .catch(error => {
-            console.error('获取签名失败:', error);
-        });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRecords);
 </script>
 
 </body>

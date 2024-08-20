@@ -6,8 +6,8 @@ const { URL } = require('url');
 const jsSHA = require('jssha');
 const axios = require('axios');
 
-// 引入 shareConfig 模块
-const shareConfig = require('./alldata/data_20240820_1');
+// 动态导入data文件
+const shareConfig = require('./alldata/data_20240820_1');  // 确保路径和文件名正确
 
 // 配置项
 const TOKEN = 'myToken';
@@ -52,19 +52,11 @@ const server = http.createServer(async (req, res) => {
     const nonce = requestUrl.searchParams.get('nonce');
     const echostr = requestUrl.searchParams.get('echostr');
 
-    console.log('Full request URL:', req.url);
-    console.log('Received signature:', signature);
-    console.log('Received timestamp:', timestamp);
-    console.log('Received nonce:', nonce);
-    console.log('Received echostr:', echostr);
-
     const hash = crypto.createHash('sha1');
     const arr = [TOKEN, timestamp, nonce].sort();
     hash.update(arr.join(''));
 
     const sha1 = hash.digest('hex');
-
-    console.log('Calculated signature:', sha1);
 
     if (sha1 === signature) {
       res.end(echostr); // 验证成功，返回echostr
