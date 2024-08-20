@@ -5,14 +5,12 @@ const crypto = require('crypto');
 const { URL } = require('url');
 const jsSHA = require('jssha');
 const axios = require('axios');
-
-// 引入config.js，确保baseUrl是全局的
 const { baseUrl } = require('./config');
 
 // 动态加载对应的data文件
 function getShareConfigById(id) {
     try {
-        const shareConfig = require(`./alldata/data_${id}`);
+        const shareConfig = require(`./alldata/data_${id}.js`); // 加载带有完整名称的文件
         return shareConfig;
     } catch (error) {
         console.error(`Failed to load data file for id: ${id}`, error);
@@ -53,7 +51,6 @@ async function getJsapiTicket() {
 }
 
 const server = http.createServer(async (req, res) => {
-  // 微信服务器验证请求部分
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const signature = requestUrl.searchParams.get('signature');
@@ -84,7 +81,6 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 处理新的API请求
   if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const id = requestUrl.searchParams.get('id');
@@ -100,7 +96,6 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 处理静态文件请求部分
   const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   const extname = path.extname(filePath);
   let contentType = 'text/html';
