@@ -11,10 +11,10 @@
     <meta name="format-detection" content="email=no">
 
     <!-- 设置站点 logo -->
-    <link rel="icon" href="images/zhandianIcon.jpg" type="image/jpeg">
-    <link rel="shortcut icon" href="images/zhandianIcon.jpg" type="image/jpeg">
-    <link rel="apple-touch-icon" href="images/zhandianIcon.jpg">
-    <meta property="og:image" content="http://119.29.5.60/images/zhandianIcon.jpg">
+    <link rel="icon" href="__BASE_URL__/images/zhandianIcon.jpg" type="image/jpeg">
+    <link rel="shortcut icon" href="__BASE_URL__/images/zhandianIcon.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="__BASE_URL__/images/zhandianIcon.jpg">
+    <meta property="og:image" content="__BASE_URL__/images/zhandianIcon.jpg">
 
     <!-- 微信分享时抓取的预览内容 -->
     <meta property="og:title" content="忘词和大兜兜的聊天记录">
@@ -105,84 +105,77 @@
 
 <script>
     function loadRecords() {
-        fetch('/api/records')  // 从指定的 API 端点获取 JSON 数据
-            .then(response => response.json()) // 解析响应为 JSON 对象
+        fetch('/api/records')
+            .then(response => response.json())
             .then(records => {
-                const container = document.getElementById('records-container'); // 获取记录容器的引用
+                const container = document.getElementById('records-container');
                 container.innerHTML = ''; // 清空容器内容
 
-                let lastUser = ''; // 用于存储上一个消息发送者的用户名
+                let lastUser = '';
 
-                records.forEach((record, index) => { // 遍历每一条记录
-                    const recordDiv = document.createElement('div'); // 创建一个新的 div 元素，用于表示一条记录
-                    recordDiv.className = 'record'; // 为这个 div 设置类名为 'record'
+                records.forEach(record => {
+                    const recordDiv = document.createElement('div');
+                    recordDiv.className = 'record';
 
-                    // 判断是否需要显示头像
                     if (record.user !== lastUser) {
-                        const avatarImg = document.createElement('img'); // 创建一个 img 元素用于显示头像
-                        avatarImg.className = 'avatar'; // 为头像设置类名为 'avatar'
-                        avatarImg.src = record.avatar; // 设置头像的图片 URL
-                        recordDiv.appendChild(avatarImg); // 将头像 img 元素添加到记录 div 中
+                        const avatarImg = document.createElement('img');
+                        avatarImg.className = 'avatar';
+                        avatarImg.src = `__BASE_URL__${record.avatar}`;
+                        recordDiv.appendChild(avatarImg);
                     } else {
-                        recordDiv.classList.add('no-avatar'); // 如果消息发送者相同，则给记录 div 添加 'no-avatar' 类
+                        recordDiv.classList.add('no-avatar');
                     }
 
-                    const contentDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
-                    contentDiv.className = 'content'; // 为内容 div 设置类名为 'content'
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'content';
 
-                    const userDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示用户名和时间
-                    userDiv.className = 'user'; // 为用户名 div 设置类名为 'user'
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user';
                     userDiv.innerHTML = `
-                        <span>${record.user}</span> <!-- 显示消息发送者的用户名 -->
-                        <span class="time">${record.time}</span> <!-- 显示消息的发送时间 -->
+                        <span>${record.user}</span>
+                        <span class="time">${record.time}</span>
                     `;
 
-                    const numbersDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
-                    numbersDiv.className = 'numbers'; // 为消息内容 div 设置类名为 'numbers'
-                    numbersDiv.innerText = record.numbers; // 将消息内容文本设置为记录中的 numbers 属性
+                    const numbersDiv = document.createElement('div');
+                    numbersDiv.className = 'numbers';
+                    numbersDiv.innerText = record.numbers;
 
-                    contentDiv.appendChild(userDiv); // 将用户名和时间 div 添加到内容 div 中
-                    contentDiv.appendChild(numbersDiv); // 将消息内容 div 添加到内容 div 中
+                    contentDiv.appendChild(userDiv);
+                    contentDiv.appendChild(numbersDiv);
+                    recordDiv.appendChild(contentDiv);
+                    container.appendChild(recordDiv);
 
-                    recordDiv.appendChild(contentDiv); // 将内容 div 添加到记录 div 中
-                    container.appendChild(recordDiv); // 将完整的记录 div 添加到容器中
-
-                    // 更新 lastUser 为当前消息的发送者用户名
                     lastUser = record.user;
                 });
             });
     }
 
-    // 当页面加载完成后，调用 loadRecords 函数加载聊天记录
     document.addEventListener('DOMContentLoaded', loadRecords);
 
-    // 微信JSSDK初始化和自定义分享代码
-    fetch('/get-signature?url=' + encodeURIComponent(window.location.href))
+    fetch('__BASE_URL__/get-signature?url=' + encodeURIComponent(window.location.href))
         .then(response => response.json())
         .then(data => {
             wx.config({
-                debug: false, // 开启调试模式
-                appId: data.appId, // 必填，公众号的唯一标识
-                timestamp: data.timestamp, // 必填，生成签名的时间戳
-                nonceStr: data.nonceStr, // 必填，生成签名的随机串
-                signature: data.signature, // 必填，签名
-                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] // 选择您需要的JS接口
+                debug: false,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData']
             });
 
             wx.ready(function () {
-                // 自定义分享给朋友的内容
                 wx.updateAppMessageShareData({
-                    title: '忘词和大兜兜的聊天记录', // 分享标题
-                    desc: '三中三：06-34-28, 三中三：35-29-30. 今天天气很好123456789好久好久货拉拉就算了打卡机考拉。', // 分享描述
-                    link: window.location.href, // 分享链接
-                    imgUrl: 'http://119.29.5.60/images/zhandianIcon.jpg' // 分享图标
+                    title: '忘词和大兜兜的聊天记录',
+                    desc: '三中三：06-34-28, 三中三：35-29-30. 今天天气很好123456789好久好久货拉拉就算了打卡机考拉。',
+                    link: window.location.href,
+                    imgUrl: '__BASE_URL__/images/zhandianIcon.jpg'
                 });
 
-                // 自定义分享到朋友圈的内容
                 wx.updateTimelineShareData({
-                    title: '忘词和大兜兜的聊天记录', // 分享标题
-                    link: window.location.href, // 分享链接
-                    imgUrl: 'http://119.29.5.60/images/zhandianIcon.jpg' // 分享图标
+                    title: '忘词和大兜兜的聊天记录',
+                    link: window.location.href,
+                    imgUrl: '__BASE_URL__/images/zhandianIcon.jpg'
                 });
             });
         })

@@ -6,8 +6,11 @@ const { URL } = require('url');
 const jsSHA = require('jssha');
 const axios = require('axios');
 
-// 引入 data.js 模块
-const { getChatRecords } = require('./data');
+// 定义全局域名变量
+const baseUrl = 'http://119.29.5.60';
+
+// 引入数据文件的模块
+const { getChatRecords } = require('./alldata/data_20240820_1');
 
 // 配置项
 const TOKEN = 'myToken';
@@ -110,6 +113,28 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // 渲染HTML文件，并注入baseUrl
+  if (req.method === 'GET' && req.url === '/') {
+    fs.readFile(path.join(__dirname, 'index.html'), 'utf8', (err, html) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/html' });
+        res.end('Server Error');
+        return;
+      }
+      // 替换HTML中的占位符
+      html = html.replace(/__BASE_URL__/g, baseUrl);
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(html);
+    });
+    return;
+  }
+
+  // API 路径处理
+  if (req.method === 'GET' && req.url === '/api/records') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(chatRecords));
+  }
+
   // 处理静态文件请求的代码
   const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   const extname = path.extname(filePath);
@@ -161,12 +186,6 @@ const server = http.createServer(async (req, res) => {
       res.end(content, 'utf-8');
     }
   });
-
-  // API 路径处理
-  if (req.method === 'GET' && req.url === '/api/records') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(chatRecords));
-  }
 });
 
 // 设置端口并启动服务器
