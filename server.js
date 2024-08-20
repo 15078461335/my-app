@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 // 微信公众号验证所需的Token
-const TOKEN = 'your_token_here'; // 请替换为您在微信公众号后台设置的Token
+const TOKEN = 'myToken'; // 请替换为您在微信公众号后台设置的Token
 
 // 模拟的动态数据，使用本地图片路径
 let chatRecords = [
