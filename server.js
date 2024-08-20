@@ -72,6 +72,7 @@ const server = http.createServer(async (req, res) => {
     if (sha1 === signature) {
       res.end(echostr); // 验证成功，返回echostr
     } else {
+      console.error('Verification failed. Signature does not match.');
       res.end('Verification failed');
     }
     return;
