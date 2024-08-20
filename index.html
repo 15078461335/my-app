@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
     <title>忘词和大兜兜的聊天记录</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,6 +28,8 @@
     <style>
         html, body {
             height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
 
@@ -82,6 +85,12 @@
         .no-avatar .content {
             margin-left: 50px; /* 为了和有头像的消息对齐 */
         }
+        .records-container {
+            height: 100%;
+            overflow-y: auto;
+            padding-bottom: 20px; /* 确保最后一条记录不会被底部遮挡 */
+        }
+
     </style>
 </head>
 <body>
