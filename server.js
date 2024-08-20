@@ -2,37 +2,50 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const url = require('url');  // 引入url模块，用于解析URL
+const url = require('url');
+const jsSHA = require('jssha');
+const axios = require('axios');
 
-// 微信公众号验证所需的Token
-const TOKEN = 'myToken'; // 请替换为您在微信公众号后台设置的Token
+// 引入 data.js 模块
+const { getChatRecords } = require('./data');
 
-// 模拟的动态数据，使用本地图片路径
-let chatRecords = [
-  {
-    user: "你是好人",
-    avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
-    numbers: `219期 新澳三中三 16-19-30 03-22-33 06-17-38 40-08-01 07-25-42 44-48-11 27-29-34
-    32-26-03 16-30-43 32-43-11 49-23-07 23-05-32 26-44-07 15-32-49 10-25-30 21-32-14
-    48-22-32 33-23-15 05-10-34 38-40-43 17-32-26 12-43-38 08-13-43 40-33-15 29-26-08
-    42-43-10 03-32-12 32-15-19 05-14-30 17-22-08 14-18-25 02-44-15 18-25-09 14-42-45
-    17-30-46 35-38-42 15-18-38 05-06-38 26-15-42 08-29-34 10-30-08 15-18-26 14-31-46
-    14-30-35 05-38-30 25-30-38 02-13-26 26-35-42 40-07-35 35-24-43 `,
-    time: "2024年8月5日 20:35"
-  },
-  {
-    user: "你是好人",
-    avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
-    numbers: `06-34-28 35-29-30 16-22-27 19-46-40 31-22-04 40-34-03 43-10-16 40-15-13 10-28-19
-    04-10-39 22-40-02 16-03-49 46-04-27 08-06-32 04-20-35 46-04-31 49-04-39 37-16-27
-    15-05-47 24-27-10 04-19-34 13-28-03 46-04-27 16-07-46 39-13-40 08-46-15 27-49-16
-    40-31-10 17-37-40 03-25-28`,
-    time: "2024年8月6日 21:19"
-  }
-];
+// 配置项
+const TOKEN = 'myToken';
+const APP_ID = 'wxda3ef9577ba6c47a';
+const APP_SECRET = '4f5638680786707538b56d0e2478c7fd';
+
+let jsapiTicket = null;
+let accessToken = null;
+let tokenExpiresAt = 0;
+
+// 获取 access_token
+async function getAccessToken() {
+    if (Date.now() < tokenExpiresAt && accessToken) {
+        return accessToken;
+    }
+    const response = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APP_ID}&secret=${APP_SECRET}`);
+    accessToken = response.data.access_token;
+    tokenExpiresAt = Date.now() + (response.data.expires_in - 600) * 1000; // 提前10分钟更新
+    return accessToken;
+}
+
+// 获取 jsapi_ticket
+async function getJsapiTicket() {
+    if (jsapiTicket) {
+        return jsapiTicket;
+    }
+    const token = await getAccessToken();
+    const response = await axios.get(`https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${token}&type=jsapi`);
+    jsapiTicket = response.data.ticket;
+    setTimeout(() => { jsapiTicket = null; }, (response.data.expires_in - 600) * 1000); // 提前10分钟更新
+    return jsapiTicket;
+}
+
+// 获取模拟数据
+let chatRecords = getChatRecords();
 
 // 创建一个HTTP服务器
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
 
   // 微信服务器验证请求
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
@@ -60,6 +73,37 @@ const server = http.createServer((req, res) => {
       res.end(echostr); // 验证成功，返回echostr
     } else {
       res.end('Verification failed');
+    }
+    return;
+  }
+
+  // JSSDK签名请求
+  if (req.method === 'GET' && req.url.startsWith('/get-signature')) {
+    const queryObject = url.parse(req.url, true).query;
+    const pageUrl = queryObject.url;
+
+    try {
+        const jsapi_ticket = await getJsapiTicket();
+        const nonceStr = 'randomString'; // 生成随机字符串
+        const timestamp = Math.floor(Date.now() / 1000);
+
+        // 生成签名
+        const string1 = `jsapi_ticket=${jsapi_ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${pageUrl}`;
+        const shaObj = new jsSHA('SHA-1', 'TEXT');
+        shaObj.update(string1);
+        const signature = shaObj.getHash('HEX');
+
+        // 返回签名数据
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            appId: APP_ID,
+            timestamp: timestamp,
+            nonceStr: nonceStr,
+            signature: signature
+        }));
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Failed to generate signature' }));
     }
     return;
   }
