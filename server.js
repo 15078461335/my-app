@@ -1,6 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+// 微信公众号验证所需的Token
+const TOKEN = 'your_token_here'; // 请替换为您在微信公众号后台设置的Token
 
 // 模拟的动态数据，使用本地图片路径
 let chatRecords = [
@@ -28,7 +32,26 @@ let chatRecords = [
 
 // 创建一个HTTP服务器
 const server = http.createServer((req, res) => {
-  // 处理请求的URL和方法
+
+  // 微信服务器验证请求
+  if (req.method === 'GET' && req.url.startsWith('/wechat')) {
+    const { signature, timestamp, nonce, echostr } = new URL(req.url, `http://${req.headers.host}`).searchParams;
+
+    const hash = crypto.createHash('sha1');
+    const arr = [TOKEN, timestamp, nonce].sort();
+    hash.update(arr.join(''));
+
+    const sha1 = hash.digest('hex');
+
+    if (sha1 === signature) {
+      res.end(echostr); // 验证成功，返回echostr
+    } else {
+      res.end('Verification failed');
+    }
+    return;
+  }
+
+  // 处理静态文件请求的代码
   const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   const extname = path.extname(filePath);
   let contentType = 'text/html';
