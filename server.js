@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const url = require('url');  // 引入url模块，用于解析URL
 
 // 微信公众号验证所需的Token
 const TOKEN = 'myToken'; // 请替换为您在微信公众号后台设置的Token
@@ -35,13 +36,24 @@ const server = http.createServer((req, res) => {
 
   // 微信服务器验证请求
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
-    const { signature, timestamp, nonce, echostr } = new URL(req.url, `http://${req.headers.host}`).searchParams;
+    const queryObject = url.parse(req.url, true).query;  // 解析URL参数
+
+    const signature = queryObject.signature;
+    const timestamp = queryObject.timestamp;
+    const nonce = queryObject.nonce;
+    const echostr = queryObject.echostr;
+
+    console.log('Received signature:', signature);
+    console.log('Received timestamp:', timestamp);
+    console.log('Received nonce:', nonce);
+    console.log('Received echostr:', echostr);
+
     const hash = crypto.createHash('sha1');
     const arr = [TOKEN, timestamp, nonce].sort();
     hash.update(arr.join(''));
 
     const sha1 = hash.digest('hex');
-    console.log('Received signature:', signature);
+
     console.log('Calculated signature:', sha1);
 
     if (sha1 === signature) {
