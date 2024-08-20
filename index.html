@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>忘词和大兜兜的聊天记录</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,30 +10,40 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="format-detection" content="email=no">
 
-
     <!-- 设置站点 logo -->
     <link rel="icon" href="images/zhandianIcon.jpg" type="image/jpeg">
     <link rel="shortcut icon" href="images/zhandianIcon.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="images/zhandianIcon.jpg">
-    <meta property="og:image" content="images/zhandianIcon.jpg">
-    
+    <meta property="og:image" content="http://119.29.5.60/images/zhandianIcon.jpg">
+
     <!-- 微信分享时抓取的预览内容 -->
     <meta property="og:title" content="忘词和大兜兜的聊天记录">
     <meta property="og:description" content="三中三：0698989, 三中三：35-29-30. 今天天气很好123456789好久好久货拉拉就算了打卡机考拉。">
     <meta name="description" content="忘词和大兜兜的聊天记录，三中三：06-34-28, 三中三：35-29-30. 今天天气很好123456789好久好久货拉拉就算了打卡机考拉。。">
-    <meta property="og:image" content="http://119.29.5.60/images/zhandianIcon.jpg">
 
     <!-- 引入微信JSSDK -->
     <script src="https://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
 
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #ffffff;
             color: #000000;
             margin: 0;
             padding: 20px;
+            height: 100%;
         }
+
+        .pay-page {
+            height: 100%;
+            overflow: auto;
+        }
+
         .record {
             display: flex;
             align-items: flex-start;
@@ -76,7 +86,9 @@
 </head>
 <body>
 
-<div id="records-container"></div>
+<div class="pay-page">
+    <div id="records-container"></div>
+</div>
 
 <script>
     function loadRecords() {
@@ -150,14 +162,14 @@
                     title: '忘词和大兜兜的聊天记录', // 分享标题
                     desc: '三中三：06-34-28, 三中三：35-29-30. 今天天气很好123456789好久好久货拉拉就算了打卡机考拉。', // 分享描述
                     link: window.location.href, // 分享链接
-                    imgUrl: 'images/zhandianIcon.jpg' // 分享图标
+                    imgUrl: 'http://119.29.5.60/images/zhandianIcon.jpg' // 分享图标
                 });
 
                 // 自定义分享到朋友圈的内容
                 wx.updateTimelineShareData({
                     title: '忘词和大兜兜的聊天记录', // 分享标题
                     link: window.location.href, // 分享链接
-                    imgUrl: 'images/zhandianIcon.jpg' // 分享图标
+                    imgUrl: 'http://119.29.5.60/images/zhandianIcon.jpg' // 分享图标
                 });
             });
         })
