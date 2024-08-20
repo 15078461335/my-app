@@ -15,9 +15,6 @@
     <link rel="shortcut icon" href="images/zhandianIcon.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="images/zhandianIcon.jpg">
 
-    <!-- 引入微信JSSDK -->
-    <script src="https://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
-
     <style>
         html, body {
             height: 100%;
@@ -98,91 +95,91 @@
 </div>
 
 <script>
-    // 从API获取数据并渲染页面
     function loadRecords() {
-        fetch('/api/records')  // 从指定的 API 端点获取 JSON 数据
-            .then(response => response.json()) // 解析响应为 JSON 对象
+        fetch('/api/shareConfig?id=1')  // 用新的API端点获取JSON数据，通过id获取对应的数据
+            .then(response => response.json())
             .then(data => {
-                const container = document.getElementById('records-container'); // 获取记录容器的引用
-                container.innerHTML = ''; // 清空容器内容
+                const { records, title, description, link, imgUrl } = data;
 
-                let lastUser = ''; // 用于存储上一个消息发送者的用户名
+                const container = document.getElementById('records-container'); 
+                container.innerHTML = ''; 
 
-                data.forEach((record, index) => { // 遍历每一条记录
-                    const recordDiv = document.createElement('div'); // 创建一个新的 div 元素，用于表示一条记录
-                    recordDiv.className = 'record'; // 为这个 div 设置类名为 'record'
+                let lastUser = ''; 
 
-                    // 判断是否需要显示头像
+                records.forEach((record, index) => {
+                    const recordDiv = document.createElement('div'); 
+                    recordDiv.className = 'record'; 
+
                     if (record.user !== lastUser) {
-                        const avatarImg = document.createElement('img'); // 创建一个 img 元素用于显示头像
-                        avatarImg.className = 'avatar'; // 为头像设置类名为 'avatar'
-                        avatarImg.src = record.avatar; // 设置头像的图片 URL
-                        recordDiv.appendChild(avatarImg); // 将头像 img 元素添加到记录 div 中
+                        const avatarImg = document.createElement('img'); 
+                        avatarImg.className = 'avatar'; 
+                        avatarImg.src = record.avatar; 
+                        recordDiv.appendChild(avatarImg); 
                     } else {
-                        recordDiv.classList.add('no-avatar'); // 如果消息发送者相同，则给记录 div 添加 'no-avatar' 类
+                        recordDiv.classList.add('no-avatar'); 
                     }
 
-                    const contentDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
-                    contentDiv.className = 'content'; // 为内容 div 设置类名为 'content'
+                    const contentDiv = document.createElement('div'); 
+                    contentDiv.className = 'content'; 
 
-                    const userDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示用户名和时间
-                    userDiv.className = 'user'; // 为用户名 div 设置类名为 'user'
+                    const userDiv = document.createElement('div'); 
+                    userDiv.className = 'user'; 
                     userDiv.innerHTML = `
-                        <span>${record.user}</span> <!-- 显示消息发送者的用户名 -->
-                        <span class="time">${record.time}</span> <!-- 显示消息的发送时间 -->
+                        <span>${record.user}</span>
+                        <span class="time">${record.time}</span>
                     `;
 
-                    const numbersDiv = document.createElement('div'); // 创建一个新的 div 元素，用于显示消息内容
-                    numbersDiv.className = 'numbers'; // 为消息内容 div 设置类名为 'numbers'
-                    numbersDiv.innerText = record.numbers; // 将消息内容文本设置为记录中的 numbers 属性
+                    const numbersDiv = document.createElement('div'); 
+                    numbersDiv.className = 'numbers';
+                    numbersDiv.innerText = record.numbers;
 
-                    contentDiv.appendChild(userDiv); // 将用户名和时间 div 添加到内容 div 中
-                    contentDiv.appendChild(numbersDiv); // 将消息内容 div 添加到内容 div 中
+                    contentDiv.appendChild(userDiv);
+                    contentDiv.appendChild(numbersDiv);
 
-                    recordDiv.appendChild(contentDiv); // 将内容 div 添加到记录 div 中
-                    container.appendChild(recordDiv); // 将完整的记录 div 添加到容器中
+                    recordDiv.appendChild(contentDiv);
+                    container.appendChild(recordDiv);
 
-                    // 更新 lastUser 为当前消息的发送者用户名
                     lastUser = record.user;
                 });
 
                 // 更新微信分享内容
-                updateWeChatShareData(data);
-            });
-    }
+                wx.ready(function () {
+                    wx.updateAppMessageShareData({
+                        title: title, 
+                        desc: description, 
+                        link: link, 
+                        imgUrl: imgUrl 
+                    });
 
-    // 动态更新微信分享内容
-    function updateWeChatShareData(data) {
-        if (data.length > 0) {
-            const shareConfig = data[0]; // 假设使用第一个记录的数据
-
-            wx.config({
-                debug: false,
-                appId: 'wxda3ef9577ba6c47a',
-                timestamp: Math.floor(Date.now() / 1000), // 当前时间戳
-                nonceStr: 'randomString', // 随机字符串
-                signature: '', // 签名需要通过调用获取
-                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData']
-            });
-
-            wx.ready(function () {
-                wx.updateAppMessageShareData({
-                    title: shareConfig.title,
-                    desc: shareConfig.description,
-                    link: shareConfig.link,
-                    imgUrl: shareConfig.imgUrl
+                    wx.updateTimelineShareData({
+                        title: title, 
+                        link: link, 
+                        imgUrl: imgUrl 
+                    });
                 });
-
-                wx.updateTimelineShareData({
-                    title: shareConfig.title,
-                    link: shareConfig.link,
-                    imgUrl: shareConfig.imgUrl
-                });
+            })
+            .catch(error => {
+                console.error('加载聊天记录失败:', error);
             });
-        }
     }
 
     document.addEventListener('DOMContentLoaded', loadRecords);
+
+    fetch('/get-signature?url=' + encodeURIComponent(window.location.href))
+        .then(response => response.json())
+        .then(data => {
+            wx.config({
+                debug: false, 
+                appId: data.appId, 
+                timestamp: data.timestamp, 
+                nonceStr: data.nonceStr, 
+                signature: data.signature, 
+                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] 
+            });
+        })
+        .catch(error => {
+            console.error('获取签名失败:', error);
+        });
 </script>
 
 </body>

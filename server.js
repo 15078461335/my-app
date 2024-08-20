@@ -6,8 +6,19 @@ const { URL } = require('url');
 const jsSHA = require('jssha');
 const axios = require('axios');
 
-// 动态导入data文件
-const shareConfig = require('./alldata/data_20240820_1');  // 确保路径和文件名正确
+// 引入config.js，确保baseUrl是全局的
+const { baseUrl } = require('./config');
+
+// 动态加载对应的data文件
+function getShareConfigById(id) {
+    try {
+        const shareConfig = require(`./alldata/data_${id}`);
+        return shareConfig;
+    } catch (error) {
+        console.error(`Failed to load data file for id: ${id}`, error);
+        return null;
+    }
+}
 
 // 配置项
 const TOKEN = 'myToken';
@@ -41,10 +52,8 @@ async function getJsapiTicket() {
     return jsapiTicket;
 }
 
-// 创建一个HTTP服务器
 const server = http.createServer(async (req, res) => {
-
-  // 微信服务器验证请求
+  // 微信服务器验证请求部分
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
     const signature = requestUrl.searchParams.get('signature');
@@ -52,11 +61,19 @@ const server = http.createServer(async (req, res) => {
     const nonce = requestUrl.searchParams.get('nonce');
     const echostr = requestUrl.searchParams.get('echostr');
 
+    console.log('Full request URL:', req.url);
+    console.log('Received signature:', signature);
+    console.log('Received timestamp:', timestamp);
+    console.log('Received nonce:', nonce);
+    console.log('Received echostr:', echostr);
+
     const hash = crypto.createHash('sha1');
     const arr = [TOKEN, timestamp, nonce].sort();
     hash.update(arr.join(''));
 
     const sha1 = hash.digest('hex');
+
+    console.log('Calculated signature:', sha1);
 
     if (sha1 === signature) {
       res.end(echostr); // 验证成功，返回echostr
@@ -67,44 +84,27 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // JSSDK签名请求
-  if (req.method === 'GET' && req.url.startsWith('/get-signature')) {
+  // 处理新的API请求
+  if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-    const pageUrl = requestUrl.searchParams.get('url');
+    const id = requestUrl.searchParams.get('id');
 
-    try {
-        const jsapi_ticket = await getJsapiTicket();
-        const nonceStr = 'randomString'; // 生成随机字符串
-        const timestamp = Math.floor(Date.now() / 1000);
-
-        // 生成签名
-        const string1 = `jsapi_ticket=${jsapi_ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${pageUrl}`;
-        const shaObj = new jsSHA('SHA-1', 'TEXT');
-        shaObj.update(string1);
-        const signature = shaObj.getHash('HEX');
-
-        // 返回签名数据
+    const shareConfig = getShareConfigById(id);
+    if (shareConfig) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-            appId: APP_ID,
-            timestamp: timestamp,
-            nonceStr: nonceStr,
-            signature: signature
-        }));
-    } catch (error) {
-        console.error('Error generating signature:', error);
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Failed to generate signature' }));
+        res.end(JSON.stringify(shareConfig));
+    } else {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Data not found' }));
     }
     return;
   }
 
-  // 处理静态文件请求的代码
+  // 处理静态文件请求部分
   const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   const extname = path.extname(filePath);
   let contentType = 'text/html';
 
-  // 根据文件扩展名设置Content-Type
   switch (extname) {
     case '.js':
       contentType = 'text/javascript';
@@ -130,35 +130,24 @@ const server = http.createServer(async (req, res) => {
       break;
   }
 
-  // 读取文件并返回响应
   fs.readFile(filePath, (err, content) => {
     if (err) {
       if (err.code == 'ENOENT') {
-        // 如果文件不存在，返回404
         fs.readFile(path.join(__dirname, '404.html'), (error, content404) => {
           res.writeHead(404, { 'Content-Type': 'text/html' });
           res.end(content404, 'utf-8');
         });
       } else {
-        // 处理其他错误
         res.writeHead(500);
         res.end(`Server Error: ${err.code}`);
       }
     } else {
-      // 成功读取文件，返回内容
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(content, 'utf-8');
     }
   });
-
-  // API 路径处理
-  if (req.method === 'GET' && req.url === '/api/records') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(shareConfig.records)); // 只返回聊天记录
-  }
 });
 
-// 设置端口并启动服务器
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
