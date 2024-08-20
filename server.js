@@ -111,7 +111,8 @@ const server = http.createServer((req, res) => {
 });
 
 // 设置端口并启动服务器
-const PORT = process.env.PORT || 3000;
+// const PORT = process.env.PORT || 3000;
+const PORT = 80;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
