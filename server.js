@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const url = require('url');
+const { URL } = require('url');
 const jsSHA = require('jssha');
 const axios = require('axios');
 
@@ -49,13 +49,13 @@ const server = http.createServer(async (req, res) => {
 
   // 微信服务器验证请求
   if (req.method === 'GET' && req.url.startsWith('/wechat')) {
-    const queryObject = url.parse(req.url, true).query;  // 解析URL参数
+    const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+    const signature = requestUrl.searchParams.get('signature');
+    const timestamp = requestUrl.searchParams.get('timestamp');
+    const nonce = requestUrl.searchParams.get('nonce');
+    const echostr = requestUrl.searchParams.get('echostr');
 
-    const signature = queryObject.signature;
-    const timestamp = queryObject.timestamp;
-    const nonce = queryObject.nonce;
-    const echostr = queryObject.echostr;
-
+    console.log('Full request URL:', req.url);
     console.log('Received signature:', signature);
     console.log('Received timestamp:', timestamp);
     console.log('Received nonce:', nonce);
@@ -79,8 +79,8 @@ const server = http.createServer(async (req, res) => {
 
   // JSSDK签名请求
   if (req.method === 'GET' && req.url.startsWith('/get-signature')) {
-    const queryObject = url.parse(req.url, true).query;
-    const pageUrl = queryObject.url;
+    const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+    const pageUrl = requestUrl.searchParams.get('url');
 
     try {
         const jsapi_ticket = await getJsapiTicket();
@@ -102,6 +102,7 @@ const server = http.createServer(async (req, res) => {
             signature: signature
         }));
     } catch (error) {
+        console.error('Error generating signature:', error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Failed to generate signature' }));
     }
