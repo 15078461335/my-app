@@ -96,7 +96,10 @@
 
 <script>
     function loadRecords() {
-        fetch('/api/shareConfig?id=1')  // 用新的API端点获取JSON数据，通过id获取对应的数据
+        const date = '20240820';  // 这里指定日期
+        const index = '1';  // 这里指定消息的序号
+
+        fetch(`/api/shareConfig?date=${date}&index=${index}`)  // 用新的API端点获取JSON数据，通过date和index获取对应的数据
             .then(response => response.json())
             .then(data => {
                 const { records, title, description, link, imgUrl } = data;

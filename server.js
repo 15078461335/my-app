@@ -8,14 +8,14 @@ const axios = require('axios');
 const { baseUrl } = require('./config');
 
 // 动态加载对应的data文件
-function getShareConfigById(id) {
+function getShareConfigByDateAndIndex(date, index) {
     try {
         // 根据你的文件命名规则，动态构建文件名
-        const fileName = `data_20240820_${id}.js`; // 你可以根据实际的日期来修改 '20240820'
+        const fileName = `data_${date}_${index}.js`; 
         const shareConfig = require(`./alldata/${fileName}`);
         return shareConfig;
     } catch (error) {
-        console.error(`Failed to load data file for id: ${id}`, error);
+        console.error(`Failed to load data file for date: ${date}, index: ${index}`, error);
         return null;
     }
 }
@@ -85,9 +85,10 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
     const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-    const id = requestUrl.searchParams.get('id');
+    const date = requestUrl.searchParams.get('date');
+    const index = requestUrl.searchParams.get('index');
 
-    const shareConfig = getShareConfigById(id);
+    const shareConfig = getShareConfigByDateAndIndex(date, index);
     if (shareConfig) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(shareConfig));
