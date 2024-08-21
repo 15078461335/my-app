@@ -10,9 +10,10 @@ const { baseUrl } = require('./config');
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
     try {
-        // 根据文件命名规则，动态构建文件名
-        const fileName = `data_${date}_${index}.js`; 
+        console.log(`Loading file for date: ${date}, index: ${index}`);  // Log
+        const fileName = `data_${date}_${index}.js`;
         const shareConfig = require(`./alldata/${fileName}`);
+        console.log(`Successfully loaded config: ${JSON.stringify(shareConfig)}`);  // Log
         return shareConfig;
     } catch (error) {
         console.error(`Failed to load data file for date: ${date}, index: ${index}`, error);
@@ -37,6 +38,7 @@ async function getAccessToken() {
     const response = await axios.get(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${APP_ID}&secret=${APP_SECRET}`);
     accessToken = response.data.access_token;
     tokenExpiresAt = Date.now() + (response.data.expires_in - 600) * 1000; // 提前10分钟更新
+    console.log(`Access token obtained: ${accessToken}`);  // Log
     return accessToken;
 }
 
@@ -49,10 +51,12 @@ async function getJsapiTicket() {
     const response = await axios.get(`https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=${token}&type=jsapi`);
     jsapiTicket = response.data.ticket;
     setTimeout(() => { jsapiTicket = null; }, (response.data.expires_in - 600) * 1000); // 提前10分钟更新
+    console.log(`Jsapi ticket obtained: ${jsapiTicket}`);  // Log
     return jsapiTicket;
 }
 
 const server = http.createServer(async (req, res) => {
+    console.log(`Incoming request: ${req.url}`);  // Log
     if (req.method === 'GET' && req.url.startsWith('/wechat')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const signature = requestUrl.searchParams.get('signature');
@@ -60,11 +64,11 @@ const server = http.createServer(async (req, res) => {
         const nonce = requestUrl.searchParams.get('nonce');
         const echostr = requestUrl.searchParams.get('echostr');
 
-        console.log('Full request URL:', req.url);
-        console.log('Received signature:', signature);
-        console.log('Received timestamp:', timestamp);
-        console.log('Received nonce:', nonce);
-        console.log('Received echostr:', echostr);
+        console.log('Full request URL:', req.url);  // Log
+        console.log('Received signature:', signature);  // Log
+        console.log('Received timestamp:', timestamp);  // Log
+        console.log('Received nonce:', nonce);  // Log
+        console.log('Received echostr:', echostr);  // Log
 
         const hash = crypto.createHash('sha1');
         const arr = [TOKEN, timestamp, nonce].sort();
@@ -72,7 +76,7 @@ const server = http.createServer(async (req, res) => {
 
         const sha1 = hash.digest('hex');
 
-        console.log('Calculated signature:', sha1);
+        console.log('Calculated signature:', sha1);  // Log
 
         if (sha1 === signature) {
             res.end(echostr); // 验证成功，返回echostr
@@ -83,11 +87,12 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    // 新的API接口，用于根据日期和序号获取数据
     if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const date = requestUrl.searchParams.get('date');
         const index = requestUrl.searchParams.get('index');
+
+        console.log(`Fetching shareConfig for date: ${date}, index: ${index}`);  // Log
 
         const shareConfig = getShareConfigByDateAndIndex(date, index);
         if (shareConfig) {
