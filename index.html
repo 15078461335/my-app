@@ -212,7 +212,7 @@ console.log("This is a test log for the server");
         .then(data => {
             console.log("WeChat signature data:", data);
             wx.config({
-                debug: false,
+                debug: true,
                 appId: data.appId,
                 timestamp: data.timestamp,
                 nonceStr: data.nonceStr,
