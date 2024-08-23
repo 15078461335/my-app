@@ -7,29 +7,6 @@ const jsSHA = require('jssha');
 const axios = require('axios');
 const { baseUrl } = require('./config');
 
-if (shareConfig) {
-    // 将HTML模板插入数据
-    fs.readFile(path.join(__dirname, 'index.html'), 'utf-8', (err, html) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/html' });
-            res.end('Server Error');
-            return;
-        }
-
-        // 替换HTML中的占位符
-        html = html.replace('{{title}}', shareConfig.title);
-        html = html.replace('{{description}}', shareConfig.description);
-        html = html.replace('{{imgUrl}}', shareConfig.imgUrl);
-        html = html.replace('{{records}}', JSON.stringify(shareConfig.records));
-
-        console.log('Replaced HTML:', html); // 打印替换后的HTML内容
-
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(html);
-    });
-}
-
-
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
     try {
@@ -149,6 +126,8 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace('{{description}}', shareConfig.description);
                 html = html.replace('{{imgUrl}}', shareConfig.imgUrl);
                 html = html.replace('{{records}}', JSON.stringify(shareConfig.records));
+
+                console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);
