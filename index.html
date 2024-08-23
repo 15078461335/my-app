@@ -33,18 +33,18 @@
             color: #000000;
             padding: 20px;
             height: 100%;
-            overflow: hidden; /* 确保页面本身没有滚动条 */
+            overflow: hidden;
         }
 
         .pay-page {
             height: 100%;
-            overflow: hidden; /* 将所有滚动限制在 #records-container */
+            overflow: hidden;
         }
 
         #records-container {
             height: 100%;
             overflow-y: auto;
-            padding-bottom: 20px; /* 确保最后一条记录不会被底部遮挡 */
+            padding-bottom: 20px;
         }
 
         .record {
@@ -63,8 +63,8 @@
 
         .record .content {
             flex-grow: 1;
-            border-bottom: 0.3px solid #d3d3d3; /* 淡灰色的分隔线 */
-            padding-bottom: 10px; /* 分隔线和内容之间的间距 */
+            border-bottom: 0.3px solid #d3d3d3;
+            padding-bottom: 10px;
         }
 
         .record .user {
@@ -89,7 +89,7 @@
         }
 
         .no-avatar .content {
-            margin-left: 50px; /* 为了和有头像的消息对齐 */
+            margin-left: 50px;
         }
     </style>
 </head>
@@ -101,55 +101,54 @@
 
 <script>
     function loadRecords() {
-        const date = '20240820';  // 这里指定日期
-        const index = '1';  // 这里指定消息的序号
+        const date = '20240820';
+        const index = '1';
 
-        fetch(`/api/shareConfig?date=${date}&index=${index}`)  
+        fetch(`/api/shareConfig?date=${date}&index=${index}`)
             .then(response => {
-                console.log("Fetched response:", response);  // 打印fetch请求的响应
+                console.log("Fetched response:", response);
                 return response.json();
             })
             .then(data => {
-                console.log("Fetched data:", data);  // 打印获取的数据
+                console.log("Fetched data:", data);
 
                 const { records, title, description, link, imgUrl } = data;
 
-                // 更新页面的微信分享预览内容
+                console.log("Updating Meta Tags with:", { title, description, imgUrl });
                 document.querySelector('meta[property="og:title"]').setAttribute('content', title);
                 document.querySelector('meta[property="og:description"]').setAttribute('content', description);
                 document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
 
-                console.log("Updated meta tags with title, description, and imgUrl.");  // 确认meta标签已更新
+                const container = document.getElementById('records-container');
+                container.innerHTML = '';
 
-                const container = document.getElementById('records-container'); 
-                container.innerHTML = ''; 
-
-                let lastUser = ''; 
+                let lastUser = '';
 
                 records.forEach((record, index) => {
-                    const recordDiv = document.createElement('div'); 
-                    recordDiv.className = 'record'; 
+                    console.log("Processing record:", record);
+                    const recordDiv = document.createElement('div');
+                    recordDiv.className = 'record';
 
                     if (record.user !== lastUser) {
-                        const avatarImg = document.createElement('img'); 
-                        avatarImg.className = 'avatar'; 
-                        avatarImg.src = record.avatar; 
-                        recordDiv.appendChild(avatarImg); 
+                        const avatarImg = document.createElement('img');
+                        avatarImg.className = 'avatar';
+                        avatarImg.src = record.avatar;
+                        recordDiv.appendChild(avatarImg);
                     } else {
-                        recordDiv.classList.add('no-avatar'); 
+                        recordDiv.classList.add('no-avatar');
                     }
 
-                    const contentDiv = document.createElement('div'); 
-                    contentDiv.className = 'content'; 
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'content';
 
-                    const userDiv = document.createElement('div'); 
-                    userDiv.className = 'user'; 
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'user';
                     userDiv.innerHTML = `
                         <span>${record.user}</span>
                         <span class="time">${record.time}</span>
-                    `; // 使用反引号包裹整个HTML模板
+                    `;
 
-                    const numbersDiv = document.createElement('div'); 
+                    const numbersDiv = document.createElement('div');
                     numbersDiv.className = 'numbers';
                     numbersDiv.innerText = record.numbers;
 
@@ -162,20 +161,19 @@
                     lastUser = record.user;
                 });
 
-                // 更新微信分享内容
                 wx.ready(function () {
-                    console.log("WeChat API ready. Updating share data.");  // WeChat API准备就绪日志
+                    console.log("WeChat API ready. Updating share data with:", { title, description, link, imgUrl });
                     wx.updateAppMessageShareData({
-                        title: title, 
-                        desc: description, 
-                        link: link, 
-                        imgUrl: imgUrl 
+                        title: title,
+                        desc: description,
+                        link: link,
+                        imgUrl: imgUrl
                     });
 
                     wx.updateTimelineShareData({
-                        title: title, 
-                        link: link, 
-                        imgUrl: imgUrl 
+                        title: title,
+                        link: link,
+                        imgUrl: imgUrl
                     });
                 });
             })
@@ -189,14 +187,14 @@
     fetch('/get-signature?url=' + encodeURIComponent(window.location.href))
         .then(response => response.json())
         .then(data => {
-            console.log("WeChat signature data:", data);  // 打印微信签名数据
+            console.log("WeChat signature data:", data);
             wx.config({
-                debug: false, 
-                appId: data.appId, 
-                timestamp: data.timestamp, 
-                nonceStr: data.nonceStr, 
-                signature: data.signature, 
-                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData'] 
+                debug: false,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: ['updateAppMessageShareData', 'updateTimelineShareData']
             });
         })
         .catch(error => {
