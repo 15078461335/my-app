@@ -134,12 +134,12 @@ console.log("This is a test log for the server");
                 const { records, title, description, link, imgUrl } = data;
 
                 console.log("Updating Meta Tags with:", { title, description, imgUrl });
-                // document.querySelector('meta[property="og:title"]').setAttribute('content', title);
-                // document.querySelector('meta[property="og:description"]').setAttribute('content', description);
-                // document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
-                document.querySelector('meta[property="og:title"]').setAttribute('content', '222固定标题');
-                document.querySelector('meta[property="og:description"]').setAttribute('content', '2222这是一个固定的描述内容');
-                document.querySelector('meta[property="og:image"]').setAttribute('content', 'http://119.29.5.60/images/fixedImage.jpg');
+                document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+                document.querySelector('meta[property="og:description"]').setAttribute('content', description);
+                document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
+                // document.querySelector('meta[property="og:title"]').setAttribute('content', '222固定标题');
+                // document.querySelector('meta[property="og:description"]').setAttribute('content', '2222这是一个固定的描述内容');
+                // document.querySelector('meta[property="og:image"]').setAttribute('content', 'http://119.29.5.60/images/fixedImage.jpg');
 
 
                 const container = document.getElementById('records-container');
