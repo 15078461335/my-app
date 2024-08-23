@@ -100,6 +100,25 @@
 </div>
 
 <script>
+    function logToServer(log) {
+    fetch('/log', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: log })
+    }).catch(error => console.error('Failed to send log to server:', error));
+}
+
+// 重写 console.log 函数，将日志发送到服务器
+console.log = function (message) {
+    logToServer(message); // 将日志发送到服务器
+    console.debug(message); // 在浏览器控制台中显示
+};
+
+// 示例：在前端代码中打印日志
+console.log("This is a test log for the server");
+
     function loadRecords() {
         const date = '20240820';
         const index = '1';

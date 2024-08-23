@@ -57,6 +57,23 @@ async function getJsapiTicket() {
 
 const server = http.createServer(async (req, res) => {
     console.log(`Incoming request: ${req.url}`);  // Log
+
+    if (req.method === 'POST' && req.url === '/log') {
+        let body = '';
+
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            const logMessage = JSON.parse(body).message;
+            console.log(`Client Log: ${logMessage}`);  // 在服务器端打印前端日志
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'Log received' }));
+        });
+        return;
+    }
+
     if (req.method === 'GET' && req.url.startsWith('/wechat')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const signature = requestUrl.searchParams.get('signature');
