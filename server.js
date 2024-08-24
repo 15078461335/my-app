@@ -103,7 +103,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
+    if (req.method === 'GET' && req.url.startsWith('/wechat/shareConfig')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const date = requestUrl.searchParams.get('date');
         const index = requestUrl.searchParams.get('index');
