@@ -4,6 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { URL } = require('url');
 const axios = require('axios');
+const { baseUrl } = require('./config');
 
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
@@ -123,7 +124,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{title}}/g, shareConfig.title);
                 html = html.replace(/{{description}}/g, shareConfig.description);
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
-                html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records));
+                html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
                 console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
