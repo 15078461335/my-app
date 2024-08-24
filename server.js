@@ -3,9 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { URL } = require('url');
-const jsSHA = require('jssha');
 const axios = require('axios');
-const { baseUrl } = require('./config');
 
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
@@ -122,10 +120,10 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 // 替换HTML中的占位符
-                html = html.replace('{{title}}', shareConfig.title);
-                html = html.replace('{{description}}', shareConfig.description);
-                html = html.replace('{{imgUrl}}', shareConfig.imgUrl);
-                html = html.replace('{{records}}', JSON.stringify(shareConfig.records));
+                html = html.replace(/{{title}}/g, shareConfig.title);
+                html = html.replace(/{{description}}/g, shareConfig.description);
+                html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
+                html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records));
 
                 console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
