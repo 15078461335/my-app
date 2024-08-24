@@ -73,36 +73,6 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.startsWith('/wechat')) {
-        const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-        const signature = requestUrl.searchParams.get('signature');
-        const timestamp = requestUrl.searchParams.get('timestamp');
-        const nonce = requestUrl.searchParams.get('nonce');
-        const echostr = requestUrl.searchParams.get('echostr');
-
-        console.log('Full request URL:', req.url);  // Log
-        console.log('Received signature:', signature);  // Log
-        console.log('Received timestamp:', timestamp);  // Log
-        console.log('Received nonce:', nonce);  // Log
-        console.log('Received echostr:', echostr);  // Log
-
-        const hash = crypto.createHash('sha1');
-        const arr = [TOKEN, timestamp, nonce].sort();
-        hash.update(arr.join(''));
-
-        const sha1 = hash.digest('hex');
-
-        console.log('Calculated signature:', sha1);  // Log
-
-        if (sha1 === signature) {
-            res.end(echostr); // 验证成功，返回echostr
-        } else {
-            console.error('Verification failed. Signature does not match.');
-            res.end('Verification failed');
-        }
-        return;
-    }
-
     if (req.method === 'GET' && req.url.startsWith('/wechat/shareConfig')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const date = requestUrl.searchParams.get('date');
@@ -134,6 +104,36 @@ const server = http.createServer(async (req, res) => {
         } else {
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Data not found' }));
+        }
+        return;
+    }
+
+    if (req.method === 'GET' && req.url === '/wechat') {
+        const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+        const signature = requestUrl.searchParams.get('signature');
+        const timestamp = requestUrl.searchParams.get('timestamp');
+        const nonce = requestUrl.searchParams.get('nonce');
+        const echostr = requestUrl.searchParams.get('echostr');
+
+        console.log('Full request URL:', req.url);  // Log
+        console.log('Received signature:', signature);  // Log
+        console.log('Received timestamp:', timestamp);  // Log
+        console.log('Received nonce:', nonce);  // Log
+        console.log('Received echostr:', echostr);  // Log
+
+        const hash = crypto.createHash('sha1');
+        const arr = [TOKEN, timestamp, nonce].sort();
+        hash.update(arr.join(''));
+
+        const sha1 = hash.digest('hex');
+
+        console.log('Calculated signature:', sha1);  // Log
+
+        if (sha1 === signature) {
+            res.end(echostr); // 验证成功，返回echostr
+        } else {
+            console.error('Verification failed. Signature does not match.');
+            res.end('Verification failed');
         }
         return;
     }
