@@ -1,5 +1,5 @@
 // config.js
 
-const baseUrl = 'http://119.29.5.60';
+const baseUrl = 'http://cxeimp.online';
 
 module.exports = { baseUrl };
