@@ -18,6 +18,7 @@ function getShareConfigByDateAndIndex(date, index) {
         console.error(`Failed to load data file for date: ${date}, index: ${index}`, error);
         return null;
     }
+    
 }
 
 // 配置项
