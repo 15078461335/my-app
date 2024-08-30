@@ -22,7 +22,7 @@ function getShareConfigByDateAndIndex(date, index) {
 }
 
 // 配置项
-const TOKEN = 'myToken';
+const TOKEN = 'xiaozhangToken';
 const APP_ID = 'wx204b30c5f21f9ee0';
 const APP_SECRET = '65b87e58f6d7097ade75be126b2006dc';
 
