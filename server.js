@@ -123,7 +123,7 @@ const server = http.createServer(async (req, res) => {
         console.log('Received echostr:', echostr);  // Log
 
         const hash = crypto.createHash('sha1');
-        const str = `${TOKEN}${timestamp}${nonce}`;  // 按照固定顺序拼接字符串
+        const str = `${timestamp}${nonce}${TOKEN}`;  // 按照修正后的顺序拼接字符串
         hash.update(str);
 
         const sha1 = hash.digest('hex');
