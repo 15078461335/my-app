@@ -96,7 +96,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                // console.log('Replaced HTML:', html); // 打印替换后的HTML内容
+                console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);
@@ -192,7 +192,8 @@ const server = http.createServer(async (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = 80;  // 改为80端口
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
