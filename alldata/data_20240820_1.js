@@ -12,13 +12,13 @@ const shareConfig = {
     sequence: 1, // 序号，表示当天的第几条消息
     records: [
         {
-            user: "今天天气晴",
+            user: "心灵鸡汤",
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
             numbers: "不同的信念，决定不同的命运",
             time: "2024年8月5日 20:35"
         },
         {
-            user: "你是好人",
+            user: "心灵鸡汤",
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
             numbers: "别人能做到的事情，我也能做到。",
             time: "2024年8月6日 21:19"
