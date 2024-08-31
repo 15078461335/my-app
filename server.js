@@ -12,13 +12,12 @@ function getShareConfigByDateAndIndex(date, index) {
         console.log(`Loading file for date: ${date}, index: ${index}`);  // Log
         const fileName = `data_${date}_${index}.js`;
         const shareConfig = require(`./alldata/${fileName}`);
-        console.log(`Successfully loaded config: ${JSON.stringify(shareConfig)}`);  // Log
+        // console.log(`Successfully loaded config: ${JSON.stringify(shareConfig)}`);  // Log
         return shareConfig;
     } catch (error) {
         console.error(`Failed to load data file for date: ${date}, index: ${index}`, error);
         return null;
     }
-    
 }
 
 // 配置项
@@ -97,7 +96,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                console.log('Replaced HTML:', html); // 打印替换后的HTML内容
+                // console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);
@@ -122,14 +121,21 @@ const server = http.createServer(async (req, res) => {
         console.log('Received nonce:', nonce);  // Log
         console.log('Received echostr:', echostr);  // Log
 
-        const hash = crypto.createHash('sha1');
-        const str = `${timestamp}${nonce}${TOKEN}`;  // 按照修正后的顺序拼接字符串
-        hash.update(str);
+        // 按照字典序对 [TOKEN, timestamp, nonce] 排序
+        const array = [TOKEN, timestamp, nonce];
+        array.sort();
 
+        // 拼接成一个字符串
+        const str = array.join('');
+
+        // 使用 SHA-1 算法生成签名
+        const hash = crypto.createHash('sha1');
+        hash.update(str);
         const sha1 = hash.digest('hex');
 
         console.log('Calculated signature:', sha1);  // Log
 
+        // 比较服务器计算的签名和请求中的签名
         if (sha1 === signature) {
             res.end(echostr); // 验证成功，返回echostr
         } else {
