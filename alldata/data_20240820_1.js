@@ -22,6 +22,24 @@ const shareConfig = {
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
             numbers: "别人能做到的事情，我也能做到。",
             time: "2024年8月6日 21:19"
+        },
+        {
+            user: "心灵鸡汤",
+            avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
+            numbers: "人们痛恨的不是改变，而是被改变。",
+            time: "2024年8月6日 21:19"
+        },
+        {
+            user: "心灵鸡汤",
+            avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
+            numbers: "成长中不计后果的那段，叫瞎颂迅做青春",
+            time: "2024年8月6日 21:19"
+        },
+        {
+            user: "心灵鸡汤",
+            avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
+            numbers: "有志始知蓬莱近，无为总觉咫尺远。",
+            time: "2024年8月6日 21:19"
         }
     ]
 };
