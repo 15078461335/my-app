@@ -108,7 +108,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url === '/wechat') {
+    if (req.method === 'GET' && req.url === '/weixin') {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const signature = requestUrl.searchParams.get('signature');
         const timestamp = requestUrl.searchParams.get('timestamp');
