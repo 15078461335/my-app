@@ -108,7 +108,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url === '/') {
+    if (req.method === 'GET' && req.url.includes('signature')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const signature = requestUrl.searchParams.get('signature');
         const timestamp = requestUrl.searchParams.get('timestamp');
