@@ -50,13 +50,13 @@ const shareConfig = {
         {
             user: "大痘痘",
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
-            numbers: "08 12 16 22 28 32 36 46 48复试三中三各组5",
+            numbers: "08 12 16 22 28 32 37 47 26复试三中三各组5",
             time: "2024年9月1日 12:41"
         },
         {
             user: "大痘痘",
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
-            numbers: "01.02.03.04.05.06.07.08.09 各十斤",
+            numbers: "01.02.03.04.05.06.03.04.05 各十斤",
             time: "2024年9月1日 12:42"
         }
     ]
