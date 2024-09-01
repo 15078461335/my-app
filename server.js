@@ -96,7 +96,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                // console.log('Replaced HTML:', html); // 打印替换后的HTML内容
+                console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);

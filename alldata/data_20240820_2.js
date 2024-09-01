@@ -58,7 +58,7 @@ const shareConfig = {
             avatar: "/images/zhangtuIcon.jpg", // 本地图片路径
             numbers: "01.02.03.04.05.06.07.08.09 各十斤",
             time: "2024年9月1日 12:42"
-        },
+        }
         
     ]
 };
