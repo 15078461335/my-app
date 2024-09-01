@@ -5,6 +5,9 @@ const crypto = require('crypto');
 const { URL } = require('url');
 const axios = require('axios');
 const { baseUrl } = require('./config');
+const express = require('express');
+
+const app = express();
 
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
@@ -191,6 +194,9 @@ const server = http.createServer(async (req, res) => {
         }
     });
 });
+
+// 设置静态文件目录
+app.use(express.static('public'));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
