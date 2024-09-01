@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>{{title}}</title>
 
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,7 +23,8 @@
     <meta property="og:image" content="{{imgUrl}}">
 
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
@@ -58,23 +61,21 @@
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            margin-right: 10px;
+            margin-right: 15px; /* 调整头像右边与内容左边距的间隔为15像素 */
         }
 
         .record .content {
             flex-grow: 1;
             border-bottom: 0.3px solid #d3d3d3;
             padding-bottom: 10px;
-            margin-left: 50px; /* 默认情况下的左边距 */
-        }
-
-        .record.no-avatar .content {
-            margin-left: 0; /* 隐藏头像时的左边距 */
+            margin-left: 0px; /* 内容左边距与头像间隔已通过margin-right调整 */
+            margin-right: 10px; /* 内容右边距 */
+            box-sizing: border-box; /* 确保 padding 和 margin 被正确计算 */
         }
 
         .record .user {
-            font-size: 16px;
-            color: #333333;
+            font-size: 12px;
+            color: #777777;
             margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
@@ -84,6 +85,12 @@
         .record .time {
             font-size: 12px;
             color: #777777;
+            position: absolute;
+            right: 10px; /* 与右边距20px对齐 */
+            top: 0;
+            white-space: nowrap; /* 不允许换行 */
+            overflow: visible; /* 确保时间标签完整显示 */
+            text-align: right; /* 确保所有时间的文本对齐 */
         }
 
         .record .numbers {
@@ -91,61 +98,72 @@
             line-height: 1.6;
             white-space: pre-wrap;
             color: #000000;
+            margin-left: 0px; /* 确保与头像右边间隔15像素 */
+            margin-right: calc(20px + 40px); /* 确保与时间标签的右边对齐，假设时间标签宽度为40px */
+            word-break: break-word; /* 确保长单词换行 */
+            box-sizing: border-box; /* 确保 padding 和 margin 被正确计算 */
+            text-align: justify; /* 强制文本两端对齐 */
+        }
+
+        .no-avatar .content {
+            margin-left: 55px; /* 当没有头像时，内容左边距为55px，确保内容整体左对齐 */
         }
     </style>
 </head>
+
 <body>
 
-<div class="pay-page">
-    <div id="records-container"></div>
-</div>
+    <div class="pay-page">
+        <div id="records-container"></div>
+    </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
 
-        const container = document.getElementById('records-container');
-        container.innerHTML = '';
+            const container = document.getElementById('records-container');
+            container.innerHTML = '';
 
-        let lastUser = '';
+            let lastUser = '';
 
-        chatRecords.forEach((record) => {
-            const recordDiv = document.createElement('div');
-            recordDiv.className = 'record';
+            chatRecords.forEach((record) => {
+                const recordDiv = document.createElement('div');
+                recordDiv.className = 'record';
 
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'content';
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'content';
 
-            if (record.user !== lastUser) {
-                const avatarImg = document.createElement('img');
-                avatarImg.className = 'avatar';
-                avatarImg.src = record.avatar;
-                recordDiv.appendChild(avatarImg);
-            } else {
-                recordDiv.classList.add('no-avatar');
-            }
+                if (record.user !== lastUser) {
+                    const avatarImg = document.createElement('img');
+                    avatarImg.className = 'avatar';
+                    avatarImg.src = record.avatar;
+                    recordDiv.appendChild(avatarImg);
+                } else {
+                    recordDiv.classList.add('no-avatar');
+                }
 
-            const userDiv = document.createElement('div');
-            userDiv.className = 'user';
-            userDiv.innerHTML = `
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user';
+                userDiv.innerHTML = `
                 <span>${record.user}</span>
                 <span class="time">${record.time}</span>
             `;
 
-            const numbersDiv = document.createElement('div');
-            numbersDiv.className = 'numbers';
-            numbersDiv.innerText = record.numbers;
+                const numbersDiv = document.createElement('div');
+                numbersDiv.className = 'numbers';
+                numbersDiv.innerText = record.numbers;
 
-            contentDiv.appendChild(userDiv);
-            contentDiv.appendChild(numbersDiv);
+                contentDiv.appendChild(userDiv);
+                contentDiv.appendChild(numbersDiv);
 
-            recordDiv.appendChild(contentDiv);
-            container.appendChild(recordDiv);
+                recordDiv.appendChild(contentDiv);
+                container.appendChild(recordDiv);
 
-            lastUser = record.user;
+                lastUser = record.user;
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>
