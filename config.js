@@ -1,7 +1,7 @@
 // config.js
 
 // const baseUrl = 'http://cxeimp.online';
-const baseUrl = 'conrx.cn';
+const baseUrl = 'cjh.conrx.cn';
 
 
 module.exports = { baseUrl };
