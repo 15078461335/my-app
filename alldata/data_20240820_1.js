@@ -4,7 +4,7 @@ const { baseUrl } = require('../config');
 
 const shareConfig = {
     id: 1, // 唯一标识符
-    title: "心灵鸡汤", // 微信分享标题
+    title: "心灵鸡汤与大痘痘的聊天记录", // 微信分享标题
     description: "同的信念，决定不同的命运，别人能做到的事情，我也能做到。", // 微信分享描述
     link: `${baseUrl}/path/to/page`, // 使用全局域名
     imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
