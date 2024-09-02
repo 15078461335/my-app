@@ -193,6 +193,10 @@
                 .then(data => {
                     try {
                         const jsonData = JSON.parse(data);  // 尝试解析为JSON
+                        console.log('==================回调签名data');
+
+                        console.log(data);
+
                         wx.config({
                             debug: false,
                             appId: jsonData.appId,
