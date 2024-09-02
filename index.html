@@ -180,51 +180,67 @@
                 lastUser = record.user;
             });
 
-            // 获取当前页面的URL
-            const currentUrl = window.location.href.split('#')[0];
+            // 微信签名逻辑
+            const url = encodeURIComponent(window.location.href);
+            console.log('Requesting signature for URL:', url);
 
-            // 获取微信签名
-            fetch(`/api/wechat-signature?url=${encodeURIComponent(currentUrl)}`)
-                .then(response => response.json())
+            fetch(`/api/wechat-signature?url=${url}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();  // 使用text()方法而不是json()方法
+                })
                 .then(data => {
-                    // 配置微信JS-SDK
-                    wx.config({
-                        debug: false,
-                        appId: data.appId,
-                        timestamp: data.timestamp,
-                        nonceStr: data.nonceStr,
-                        signature: data.signature,
-                        jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
-                    });
-
-                    // 自定义分享内容
-                    wx.ready(function () {
-                        wx.onMenuShareAppMessage({
-                            title: '{{title}}', // 分享标题
-                            desc: '{{description}}', // 分享描述
-                            link: currentUrl, // 分享链接
-                            imgUrl: '{{imgUrl}}', // 分享图标
-                            success: function () {
-                                // 用户确认分享后执行的回调函数
-                            },
-                            cancel: function () {
-                                // 用户取消分享后执行的回调函数
-                            }
+                    try {
+                        const jsonData = JSON.parse(data);  // 尝试解析为JSON
+                        wx.config({
+                            debug: false,
+                            appId: jsonData.appId,
+                            timestamp: jsonData.timestamp,
+                            nonceStr: jsonData.nonceStr,
+                            signature: jsonData.signature,
+                            jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
                         });
 
-                        wx.onMenuShareTimeline({
-                            title: '{{title}}', // 分享标题
-                            link: currentUrl, // 分享链接
-                            imgUrl: '{{imgUrl}}', // 分享图标
-                            success: function () {
-                                // 用户确认分享后执行的回调函数
-                            },
-                            cancel: function () {
-                                // 用户取消分享后执行的回调函数
-                            }
-                        });
-                    });
+                        wx.ready(function () {
+                            wx.onMenuShareAppMessage({
+                                title: '{{title}}',
+                                desc: '{{description}}',
+                                link: window.location.href,
+                                imgUrl: '{{imgUrl}}',
+                                success: function () {
+                                    // 用户确认分享后执行的回调函数
+                                },
+                                cancel: function () {
+                                    // 用户取消分享后执行的回调函数
+                                }
+                            });
 
+                            wx.onMenuShareTimeline({
+                                title: '{{title}}',
+                                link: window.location.href,
+                                imgUrl: '{{imgUrl}}',
+                                success: function () {
+                                    // 用户确认分享后执行的回调函数
+                                },
+                                cancel: function () {
+                                    // 用户取消分享后执行的回调函数
+                                }
+                            });
+                        });
+
+                        wx.error(function (res) {
+                            console.log('wx.error: ', res);
+                        });
+
+                    } catch (e) {
+                        console.error('Failed to parse JSON:', e);
+                        console.error('Server response:', data);  // 打印服务器返回的数据
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during fetch:', error);
                 });
         });
     </script>
