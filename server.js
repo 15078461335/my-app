@@ -137,6 +137,7 @@ const server = http.createServer(async (req, res) => {
 
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
         const signatureData = wechat.generateSignature(jsapi_ticket, fullUrl);  // 调用wechat.js中的生成签名函数
+        console.log('签名======',signatureData);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -145,6 +146,7 @@ const server = http.createServer(async (req, res) => {
             nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
             signature: signatureData.signature   // 从signatureData中提取签名
         }));
+
         return;
     }
 

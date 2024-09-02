@@ -15,7 +15,6 @@ function validateSignature(token, queryObject) {
 
 // JSSDK签名生成的逻辑
 function generateSignature(jsapi_ticket, url) {
-    console.log('44444444generateSignature:', url);
 
     const nonceStr = 'randomString'; // 生成随机字符串
     const timestamp = Math.floor(Date.now() / 1000);
