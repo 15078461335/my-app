@@ -123,11 +123,19 @@ const server = http.createServer(async (req, res) => {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         console.log('After:', requestUrl.href);
 
-        const urlParam = requestUrl.searchParams.get('url');
-        const fullUrl = new URL(urlParam);
-        
+        // 使用 'url=' 作为分隔符提取完整的 URL 参数
+        const urlIndex = req.url.indexOf('url=');
+        let fullUrl = null;
+
+        if (urlIndex !== -1) {
+            fullUrl = decodeURIComponent(req.url.substring(urlIndex + 4));
+            console.log('完整URL:', fullUrl);
+        } else {
+            console.log('未找到 url 参数');
+        }
+
         console.log('完整URL:', fullUrl.href);
-        
+
 
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
         const signatureData = wechat.generateSignature(jsapi_ticket, fullUrl);  // 调用wechat.js中的生成签名函数
