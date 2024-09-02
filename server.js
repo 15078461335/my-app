@@ -159,7 +159,7 @@ const server = http.createServer(async (req, res) => {
             res.end(echostr); // 验证成功，返回echostr
         } else {
             console.error('Verification failed. Signature does not match.');
-            res.end('Verification failed');
+            res.status(400).json({ error: 'Verification failed' }); // 返回JSON格式的错误信息
         }
         return;
     }
