@@ -124,6 +124,8 @@ const server = http.createServer(async (req, res) => {
         console.log('After:', requestUrl.href);
 
         const url = requestUrl.searchParams.get('url');
+        console.log('333333333333:', url);
+
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
         const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
 
