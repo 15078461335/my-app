@@ -20,6 +20,7 @@ let tokenExpiresAt = 0;
 
 // 新增 API 路径，用于获取微信 JS-SDK 的签名信息
 app.get('/api/wechat-signature', async (req, res) => {
+    console.log('======后端收到微信签名的请求');
     const url = req.query.url;  // 从请求参数中获取当前页面的URL
     const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
     const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
@@ -50,6 +51,8 @@ function getShareConfigByDateAndIndex(date, index) {
 
 // 获取 access_token
 async function getAccessToken() {
+    console.log('======getAccessToken');
+
     if (Date.now() < tokenExpiresAt && accessToken) {
         return accessToken;
     }
@@ -62,6 +65,8 @@ async function getAccessToken() {
 
 // 获取 jsapi_ticket
 async function getJsapiTicket() {
+    console.log('=====getJsapiTicket');
+
     if (jsapiTicket) {
         return jsapiTicket;
     }
