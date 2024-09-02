@@ -123,11 +123,14 @@ const server = http.createServer(async (req, res) => {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         console.log('After:', requestUrl.href);
 
-        const url = requestUrl.searchParams.get('url');
-        console.log('333333333333:', url);
+        const urlParam = requestUrl.searchParams.get('url');
+        const fullUrl = new URL(urlParam);
+        
+        console.log('完整URL:', fullUrl.href);
+        
 
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
-        const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
+        const signatureData = wechat.generateSignature(jsapi_ticket, fullUrl);  // 调用wechat.js中的生成签名函数
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
