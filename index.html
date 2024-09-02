@@ -185,24 +185,20 @@
 
             fetch(`/api/wechat-qianming?url=${url}`)
                 .then(response => {
-                    console.log('==================',response);
+                    console.log('==================', response);
 
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    console.log('签名response:', response.text());
 
-                    return response.text();  // 使用text()方法而不是json()方法
-
+                    return response.text();  // 读取响应体并返回
                 })
                 .then(data => {
-                    console.log('==================',data);
+                    console.log('签名response:', data);
 
                     try {
-                        const jsonData = JSON.parse(data);  // 尝试解析为JSON
-                        console.log('==================回调签名data');
-
-                        console.log(data);
+                        const jsonData = JSON.parse(data);  // 解析响应体为JSON
+                        console.log('==================回调签名data', jsonData);
 
                         wx.config({
                             debug: true,
@@ -252,6 +248,8 @@
                 .catch(error => {
                     console.error('Error during fetch:', error);
                 });
+
+
         });
     </script>
 
