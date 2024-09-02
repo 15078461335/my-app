@@ -190,6 +190,8 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
+                    console.log('签名response:', response.text());
+
                     return response.text();  // 使用text()方法而不是json()方法
 
                 })
