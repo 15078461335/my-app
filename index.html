@@ -136,6 +136,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            console.log('Requesting signature for URL:', window.location.href);
             const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
 
             const container = document.getElementById('records-container');

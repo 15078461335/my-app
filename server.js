@@ -9,6 +9,15 @@ const express = require('express');
 const wechat = require('./wechat');  // 已有的wechat.js模块
 const app = express();  // app对象在这里被初始化
 
+// 配置项
+const TOKEN = 'xiaozhangToken';
+const APP_ID = 'wx204b30c5f21f9ee0';
+const APP_SECRET = '65b87e58f6d7097ade75be126b2006dc';
+
+let jsapiTicket = null;
+let accessToken = null;
+let tokenExpiresAt = 0;
+
 // 新增 API 路径，用于获取微信 JS-SDK 的签名信息
 app.get('/api/wechat-signature', async (req, res) => {
     const url = req.query.url;  // 从请求参数中获取当前页面的URL
@@ -38,14 +47,6 @@ function getShareConfigByDateAndIndex(date, index) {
     }
 }
 
-// 配置项
-const TOKEN = 'xiaozhangToken';
-const APP_ID = 'wx204b30c5f21f9ee0';
-const APP_SECRET = '65b87e58f6d7097ade75be126b2006dc';
-
-let jsapiTicket = null;
-let accessToken = null;
-let tokenExpiresAt = 0;
 
 // 获取 access_token
 async function getAccessToken() {
@@ -114,7 +115,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                console.log('Replaced HTML:', html); // 打印替换后的HTML内容
+                // console.log('Replaced HTML:', html); // 打印替换后的HTML内容
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);

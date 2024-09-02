@@ -19,6 +19,11 @@ function generateSignature(jsapi_ticket, url) {
     const timestamp = Math.floor(Date.now() / 1000);
     // 解码 URL 确保使用原始 URL 进行签名
     const decodedUrl = decodeURIComponent(url);
+    // 打印所有关键变量
+    console.log('jsapi_ticket:', jsapi_ticket);
+    console.log('nonceStr:', nonceStr);
+    console.log('timestamp:', timestamp);
+    console.log('decodedUrl:', decodedUrl);
     const string1 = `jsapi_ticket=${jsapi_ticket}&noncestr=${nonceStr}&timestamp=${timestamp}&url=${url}`;
     const shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(string1);
