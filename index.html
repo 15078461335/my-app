@@ -22,6 +22,9 @@
     <meta property="og:description" content="{{description}}">
     <meta property="og:image" content="{{imgUrl}}">
 
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+
+
     <style>
         html,
         body {
@@ -61,16 +64,20 @@
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            margin-right: 15px; /* 调整头像右边与内容左边距的间隔为15像素 */
+            margin-right: 15px;
+            /* 调整头像右边与内容左边距的间隔为15像素 */
         }
 
         .record .content {
             flex-grow: 1;
             border-bottom: 0.3px solid #d3d3d3;
             padding-bottom: 10px;
-            margin-left: 0px; /* 内容左边距与头像间隔已通过margin-right调整 */
-            margin-right: 10px; /* 内容右边距 */
-            box-sizing: border-box; /* 确保 padding 和 margin 被正确计算 */
+            margin-left: 0px;
+            /* 内容左边距与头像间隔已通过margin-right调整 */
+            margin-right: 10px;
+            /* 内容右边距 */
+            box-sizing: border-box;
+            /* 确保 padding 和 margin 被正确计算 */
         }
 
         .record .user {
@@ -86,11 +93,15 @@
             font-size: 12px;
             color: #777777;
             position: absolute;
-            right: 10px; /* 与右边距20px对齐 */
+            right: 10px;
+            /* 与右边距20px对齐 */
             top: 0;
-            white-space: nowrap; /* 不允许换行 */
-            overflow: visible; /* 确保时间标签完整显示 */
-            text-align: right; /* 确保所有时间的文本对齐 */
+            white-space: nowrap;
+            /* 不允许换行 */
+            overflow: visible;
+            /* 确保时间标签完整显示 */
+            text-align: right;
+            /* 确保所有时间的文本对齐 */
         }
 
         .record .numbers {
@@ -98,15 +109,21 @@
             line-height: 1.6;
             white-space: pre-wrap;
             color: #000000;
-            margin-left: 0px; /* 确保与头像右边间隔15像素 */
-            margin-right: calc(20px + 40px); /* 确保与时间标签的右边对齐，假设时间标签宽度为40px */
-            word-break: break-word; /* 确保长单词换行 */
-            box-sizing: border-box; /* 确保 padding 和 margin 被正确计算 */
-            text-align: justify; /* 强制文本两端对齐 */
+            margin-left: 0px;
+            /* 确保与头像右边间隔15像素 */
+            margin-right: calc(20px + 40px);
+            /* 确保与时间标签的右边对齐，假设时间标签宽度为40px */
+            word-break: break-word;
+            /* 确保长单词换行 */
+            box-sizing: border-box;
+            /* 确保 padding 和 margin 被正确计算 */
+            text-align: justify;
+            /* 强制文本两端对齐 */
         }
 
         .no-avatar .content {
-            margin-left: 55px; /* 当没有头像时，内容左边距为55px，确保内容整体左对齐 */
+            margin-left: 55px;
+            /* 当没有头像时，内容左边距为55px，确保内容整体左对齐 */
         }
     </style>
 </head>
@@ -161,6 +178,53 @@
 
                 lastUser = record.user;
             });
+
+            // 获取当前页面的URL
+            const currentUrl = window.location.href.split('#')[0];
+
+            // 获取微信签名
+            fetch(`/api/wechat-signature?url=${encodeURIComponent(currentUrl)}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 配置微信JS-SDK
+                    wx.config({
+                        debug: false,
+                        appId: data.appId,
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        signature: data.signature,
+                        jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+                    });
+
+                    // 自定义分享内容
+                    wx.ready(function () {
+                        wx.onMenuShareAppMessage({
+                            title: '{{title}}', // 分享标题
+                            desc: '{{description}}', // 分享描述
+                            link: currentUrl, // 分享链接
+                            imgUrl: '{{imgUrl}}', // 分享图标
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
+                        });
+
+                        wx.onMenuShareTimeline({
+                            title: '{{title}}', // 分享标题
+                            link: currentUrl, // 分享链接
+                            imgUrl: '{{imgUrl}}', // 分享图标
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
+                        });
+                    });
+
+                });
         });
     </script>
 
