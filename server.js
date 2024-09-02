@@ -135,7 +135,7 @@ const server = http.createServer(async (req, res) => {
         }
         return;
     }
-    if (req.method === 'GET' && req.url.startsWith('/api/wechat-signature')) {
+    if (req.method === 'GET' && req.url.startsWith('/api/wechat-qianming')) {
         console.log('Received signature request');
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const url = requestUrl.searchParams.get('url');
