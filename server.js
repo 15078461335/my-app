@@ -7,6 +7,7 @@ const axios = require('axios');
 const { baseUrl } = require('./config');
 const express = require('express');
 const wechat = require('./wechat');  // 已有的wechat.js模块
+const app = express();  // app对象在这里被初始化
 
 // 新增 API 路径，用于获取微信 JS-SDK 的签名信息
 app.get('/api/wechat-signature', async (req, res) => {
@@ -22,10 +23,6 @@ app.get('/api/wechat-signature', async (req, res) => {
     });
 });
 
-
-
-
-const app = express();
 
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
