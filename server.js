@@ -164,7 +164,8 @@ const server = http.createServer(async (req, res) => {
             res.end(echostr); // 验证成功，返回echostr
         } else {
             console.error('Verification failed. Signature does not match.');
-            res.status(400).json({ error: 'Verification failed' }); // 返回JSON格式的错误信息
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Verification failed' })); //返回JSON格式的错误信息
         }
         return;
     }
