@@ -20,17 +20,19 @@ let tokenExpiresAt = 0;
 
 // 新增 API 路径，用于获取微信 JS-SDK 的签名信息
 app.get('/api/wechat-signature', async (req, res) => {
+    console.log('Received signature request');
+    console.log('URL Parameter:', req.query.url);
     console.log('======后端收到微信签名的请求');
-    const url = req.query.url;  // 从请求参数中获取当前页面的URL
-    const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
-    const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
+    // const url = req.query.url;  // 从请求参数中获取当前页面的URL
+    // const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
+    // const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
 
-    res.json({
-        appId: APP_ID, // 直接使用你在server.js中定义的APP_ID变量
-        timestamp: signatureData.timestamp,  // 从signatureData中提取时间戳
-        nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
-        signature: signatureData.signature   // 从signatureData中提取签名
-    });
+    // res.json({
+    //     appId: APP_ID, // 直接使用你在server.js中定义的APP_ID变量
+    //     timestamp: signatureData.timestamp,  // 从signatureData中提取时间戳
+    //     nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
+    //     signature: signatureData.signature   // 从signatureData中提取签名
+    // });
 });
 
 
