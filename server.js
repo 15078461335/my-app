@@ -18,22 +18,24 @@ let jsapiTicket = null;
 let accessToken = null;
 let tokenExpiresAt = 0;
 
-// 新增 API 路径，用于获取微信 JS-SDK 的签名信息
-app.get('/api/wechat-signature', async (req, res) => {
-    console.log('Received signature request');
-    console.log('URL Parameter:', req.query.url);
-    console.log('======后端收到微信签名的请求');
-    // const url = req.query.url;  // 从请求参数中获取当前页面的URL
-    // const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
-    // const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
+console.log('1111111');
 
-    // res.json({
-    //     appId: APP_ID, // 直接使用你在server.js中定义的APP_ID变量
-    //     timestamp: signatureData.timestamp,  // 从signatureData中提取时间戳
-    //     nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
-    //     signature: signatureData.signature   // 从signatureData中提取签名
-    // });
-});
+// 新增 API 路径，用于获取微信 JS-SDK 的签名信息
+// app.get('/api/wechat-signature', async (req, res) => {
+//     console.log('Received signature request');
+//     console.log('URL Parameter:', req.query.url);
+//     console.log('======后端收到微信签名的请求');
+//     const url = req.query.url;  // 从请求参数中获取当前页面的URL
+//     const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
+//     const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
+
+//     res.json({
+//         appId: APP_ID, // 直接使用你在server.js中定义的APP_ID变量
+//         timestamp: signatureData.timestamp,  // 从signatureData中提取时间戳
+//         nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
+//         signature: signatureData.signature   // 从signatureData中提取签名
+//     });
+// });
 
 
 // 动态加载对应的data文件
@@ -133,6 +135,25 @@ const server = http.createServer(async (req, res) => {
         }
         return;
     }
+    if (req.method === 'GET' && req.url.startsWith('/api/wechat-signature')) {
+        console.log('Received signature request');
+        const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+        const url = requestUrl.searchParams.get('url');
+        console.log('URL Parameter:', url);
+        console.log('======后端收到微信签名的请求');
+        const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
+        const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            appId: APP_ID, // 直接使用你在server.js中定义的APP_ID变量
+            timestamp: signatureData.timestamp,  // 从signatureData中提取时间戳
+            nonceStr: signatureData.nonceStr,    // 从signatureData中提取随机字符串
+            signature: signatureData.signature   // 从signatureData中提取签名
+        }));
+        return;
+    }
+
 
     if (req.method === 'GET' && req.url.includes('signature')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
