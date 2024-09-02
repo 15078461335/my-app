@@ -118,8 +118,11 @@ const server = http.createServer(async (req, res) => {
         return;
     }
     if (req.method === 'GET' && req.url.startsWith('/api/wechat-qianming')) {
-        console.log('微信签名请求 request');
+        console.log('微信签名请求 api/wechat-qianming');
+        console.log('Before:', req.url);
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+        console.log('After:', requestUrl.href);
+
         const url = requestUrl.searchParams.get('url');
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
         const signatureData = wechat.generateSignature(jsapi_ticket, url);  // 调用wechat.js中的生成签名函数
