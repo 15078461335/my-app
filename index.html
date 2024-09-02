@@ -136,7 +136,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('Requesting signature for URL:', window.location.href);
             const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
 
             const container = document.getElementById('records-container');
@@ -181,7 +180,7 @@
             });
 
             // 微信签名逻辑
-            const url = encodeURIComponent(window.location.href);
+            const url = window.location.href;  // 直接使用未经编码的URL
             console.log('Requesting signature for URL:', url);
 
             fetch(`/api/wechat-signature?url=${url}`)
