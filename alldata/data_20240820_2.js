@@ -5,7 +5,7 @@ const { baseUrl } = require('../config');
 const shareConfig = {
     id: 2, // 唯一标识符
     title: "小钢炮的聊天记录", // 微信分享标题
-    description: "小钢炮:02.26.24.22.08各 5 米12.36.48.46各5 米，， 14.38各25 米 聊天记录", // 微信分享描述
+    description: "小钢炮:02.26.24.22.08各 5 米12.36.48.46各5 米，，  聊天记录", // 微信分享描述
     link: `${baseUrl}/path/to/page`, // 使用全局域名
     imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "17:11", // 消息日期
