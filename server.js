@@ -18,22 +18,18 @@ let jsapiTicket = null;
 let accessToken = null;
 let tokenExpiresAt = 0;
 
-
-
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
     try {
         console.log(`Loading file for date: ${date}, index: ${index}`);  // Log
         const fileName = `data_${date}_${index}.js`;
         const shareConfig = require(`./alldata/${fileName}`);
-        // console.log(`Successfully loaded config: ${JSON.stringify(shareConfig)}`);  // Log
         return shareConfig;
     } catch (error) {
         console.error(`Failed to load data file for date: ${date}, index: ${index}`, error);
         return null;
     }
 }
-
 
 // 获取 access_token
 async function getAccessToken() {
@@ -83,10 +79,14 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.startsWith('/api/shareConfig')) {
+    if (req.method === 'GET' && (req.url.startsWith('/api/shareConfig') || req.url === '/')) {
+        // 默认的 date 和 index
+        const defaultDate = '20240820';
+        const defaultIndex = '1';
+
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-        const date = requestUrl.searchParams.get('date');
-        const index = requestUrl.searchParams.get('index');
+        const date = req.url === '/' ? defaultDate : requestUrl.searchParams.get('date');
+        const index = req.url === '/' ? defaultIndex : requestUrl.searchParams.get('index');
 
         console.log(`Fetching shareConfig for date: ${date}, index: ${index}`);  // Log
 
@@ -106,8 +106,6 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                // console.log('Replaced HTML:', html); // 打印替换后的HTML内容
-
                 res.writeHead(200, { 'Content-Type': 'text/html' });
                 res.end(html);
             });
@@ -117,6 +115,7 @@ const server = http.createServer(async (req, res) => {
         }
         return;
     }
+
     if (req.method === 'GET' && req.url.startsWith('/api/wechat-qianming')) {
         console.log('微信签名请求 api/wechat-qianming');
         console.log('Before:', req.url);
@@ -134,10 +133,9 @@ const server = http.createServer(async (req, res) => {
             console.log('未找到 url 参数');
         }
 
-
         const jsapi_ticket = await getJsapiTicket();  // 获取jsapi_ticket
         const signatureData = wechat.generateSignature(jsapi_ticket, fullUrl);  // 调用wechat.js中的生成签名函数
-        console.log('签名======',signatureData);
+        console.log('签名======', signatureData);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -149,7 +147,6 @@ const server = http.createServer(async (req, res) => {
 
         return;
     }
-
 
     if (req.method === 'GET' && req.url.includes('signature')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
