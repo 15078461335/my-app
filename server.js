@@ -82,7 +82,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && (req.url.startsWith('/api/shareConfig') || req.url === '/')) {
         // 默认的 date 和 index
         const defaultDate = '20240820';
-        const defaultIndex = '4';
+        const defaultIndex = '2';
 
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const date = req.url === '/' ? defaultDate : requestUrl.searchParams.get('date');
