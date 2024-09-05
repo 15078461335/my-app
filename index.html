@@ -24,33 +24,32 @@
 
     <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
 
-
     <style>
-        html,
-        body {
-            height: 100%;
+        html, body {
             margin: 0;
             padding: 0;
+            height: 100%;
+            overflow: hidden; /* 防止页面产生额外的滚动条 */
         }
 
         body {
             font-family: Arial, sans-serif;
             background-color: #ffffff;
             color: #000000;
-            padding: 20px;
-            height: 100%;
-            overflow: hidden;
         }
 
         .pay-page {
-            height: 100%;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* 让页面高度充满视口，防止 body 滚动 */
+            overflow: hidden; /* 确保整个页面无滚动 */
         }
 
         #records-container {
-            height: 100%;
-            overflow-y: auto;
+            flex-grow: 1; /* 使容器自动填充剩余空间 */
+            overflow-y: auto; /* 只允许垂直方向滚动 */
             padding-bottom: 20px;
+            box-sizing: border-box; /* 确保 padding 和 border 不会影响布局 */
         }
 
         .record {
@@ -64,8 +63,7 @@
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            margin-right: 15px;
-            /* 调整头像右边与内容左边距的间隔为15像素 */
+            margin-right: 15px; /* 确保头像与内容之间的间隔 */
         }
 
         .record .content {
@@ -73,11 +71,8 @@
             border-bottom: 0.3px solid #d3d3d3;
             padding-bottom: 10px;
             margin-left: 0px;
-            /* 内容左边距与头像间隔已通过margin-right调整 */
             margin-right: 0px;
-            /* 内容右边距 */
             box-sizing: border-box;
-            /* 确保 padding 和 margin 被正确计算 */
         }
 
         .record .user {
@@ -94,14 +89,8 @@
             color: #777777;
             position: absolute;
             right: 0px;
-            /* 与右边距20px对齐 */
             top: 0;
             white-space: nowrap;
-            /* 不允许换行 */
-            overflow: visible;
-            /* 确保时间标签完整显示 */
-            text-align: right;
-            /* 确保所有时间的文本对齐 */
         }
 
         .record .numbers {
@@ -109,21 +98,14 @@
             line-height: 1.6;
             white-space: pre-wrap;
             color: #000000;
-            margin-left: 0px;
-            /* 确保与头像右边间隔15像素 */
             margin-right: calc(20px + 40px);
-            /* 确保与时间标签的右边对齐，假设时间标签宽度为40px */
             word-break: break-word;
-            /* 确保长单词换行 */
             box-sizing: border-box;
-            /* 确保 padding 和 margin 被正确计算 */
             text-align: justify;
-            /* 强制文本两端对齐 */
         }
 
         .no-avatar .content {
             margin-left: 55px;
-            /* 当没有头像时，内容左边距为55px，确保内容整体左对齐 */
         }
     </style>
 </head>
@@ -185,78 +167,57 @@
 
             fetch(`/api/wechat-qianming?url=${url}`)
                 .then(response => {
-                    console.log('==================', response);
-
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
 
-                    return response.text();  // 读取响应体并返回
+                    return response.text();
                 })
                 .then(data => {
-                    console.log('签名response:', data);
+                    const jsonData = JSON.parse(data);
+                    wx.config({
+                        debug: false,
+                        appId: jsonData.appId,
+                        timestamp: jsonData.timestamp,
+                        nonceStr: jsonData.nonceStr,
+                        signature: jsonData.signature,
+                        jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+                    });
 
-                    try {
-                        const jsonData = JSON.parse(data);  // 解析响应体为JSON
-                        console.log('==================回调签名data', jsonData);
-
-                        wx.config({
-                            debug: false,
-                            appId: jsonData.appId,
-                            timestamp: jsonData.timestamp,
-                            nonceStr: jsonData.nonceStr,
-                            signature: jsonData.signature,
-                            jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+                    wx.ready(function () {
+                        wx.onMenuShareAppMessage({
+                            title: '{{title}}',
+                            desc: '分享描述信息',
+                            link: window.location.href,
+                            imgUrl: '{{imgUrl}}',
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
                         });
 
-                        wx.ready(function () {
-                            console.log('readyreadyreadyreadyreadyreadyready==================回调签名data');
-
-                            wx.onMenuShareAppMessage({
-                                title: '{{title}}',
-                                /*
-                                   desc: '{{description}}',
-
-                                */
-                                desc: '大痘痘:43.20.21.17.18.10.15.11各15米 31.29.33.06.05.03.07.32.22.25.12.24各5米 大痘痘:40 35各二十米，23 02 34 29 04 05 09 20 22 25 28 47 42 44 45 49 11 16各十米',
-
-                                link: window.location.href,
-                                imgUrl: '{{imgUrl}}',
-                                success: function () {
-                                    // 用户确认分享后执行的回调函数
-                                },
-                                cancel: function () {
-                                    // 用户取消分享后执行的回调函数
-                                }
-                            });
-
-                            wx.onMenuShareTimeline({
-                                title: '{{title}}',
-                                link: window.location.href,
-                                imgUrl: '{{imgUrl}}',
-                                success: function () {
-                                    // 用户确认分享后执行的回调函数
-                                },
-                                cancel: function () {
-                                    // 用户取消分享后执行的回调函数
-                                }
-                            });
+                        wx.onMenuShareTimeline({
+                            title: '{{title}}',
+                            link: window.location.href,
+                            imgUrl: '{{imgUrl}}',
+                            success: function () {
+                                // 用户确认分享后执行的回调函数
+                            },
+                            cancel: function () {
+                                // 用户取消分享后执行的回调函数
+                            }
                         });
+                    });
 
-                        wx.error(function (res) {
-                            console.log('wx.error: ', res);
-                        });
-
-                    } catch (e) {
-                        console.error('Failed to parse JSON:', e);
-                        console.error('Server response:', data);  // 打印服务器返回的数据
-                    }
+                    wx.error(function (res) {
+                        console.log('wx.error: ', res);
+                    });
                 })
                 .catch(error => {
                     console.error('Error during fetch:', error);
                 });
-
-
         });
     </script>
 
