@@ -57,6 +57,7 @@
             align-items: flex-start;
             padding-bottom: 20px;
             position: relative;
+            margin-left: 15px; /* 确保消息与页面左边距一致 */
         }
 
         .record .avatar {
@@ -64,16 +65,14 @@
             height: 40px;
             border-radius: 8px;
             margin-right: 15px; /* 确保头像与内容之间的间隔 */
-            margin-left: 15px; /* 确保头像与内容之间的间隔 */
             margin-top: 15px;
-
         }
 
         .record .content {
             flex-grow: 1;
             border-bottom: 0.3px solid #d3d3d3;
             padding-bottom: 10px;
-            margin-left: 15px;
+            margin-left: 0; /* 消除内容的左边距 */
             margin-right: 15px;
             box-sizing: border-box;
         }
@@ -108,7 +107,7 @@
         }
 
         .no-avatar .content {
-            margin-left: 70px;
+            margin-left: 55px; /* 与有头像时的内容对齐 */
         }
     </style>
 </head>
