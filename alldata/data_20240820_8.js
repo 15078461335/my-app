@@ -5,7 +5,7 @@ const { baseUrl } = require('../config');
 const shareConfig = {
     id: 8, // 唯一标识符
     title: "逆子的聊天记录", // 微信分享标题
-    description: "逆子:02.06.18.33\n逆子:08.34.16\n聊天记录", // 微信分享描述
+    description: "逆子:牛羊鼠兔\n逆子:狗虎龙\n聊天记录", // 微信分享描述
     link: `${baseUrl}/path/to/page`, // 使用全局域名
     imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
