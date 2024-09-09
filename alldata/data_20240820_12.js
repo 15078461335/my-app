@@ -44,7 +44,7 @@ const shareConfig = {
         {
             user: "逆天",
             avatar: "/images/20240905_1.jpg", // 本地图片路径
-            numbers: "26 02 16 36 37 44 18 09 复试三中三各组10",
+            numbers: "26 01 16 36 27 44 18 19 复试三中三各组10",
             time: "19:54"
         },
         {
