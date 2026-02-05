@@ -8,6 +8,7 @@ const { baseUrl } = require('./config');
 const express = require('express');
 const wechat = require('./wechat');  // 已有的wechat.js模块
 const app = express();  // app对象在这里被初始化
+app.use(express.static('public'));
 
 // 配置项
 const TOKEN = 'xiaozhangToken';
@@ -63,6 +64,21 @@ async function getJsapiTicket() {
 const server = http.createServer(async (req, res) => {
     console.log(`进服务器的请求: ${req.url}`);  // Log
 
+    // 微信公众号验证专用文件处理
+    if (req.method === 'GET' && req.url === '/MP_verify_fXlWdCzWOutXlUjk.txt') {
+        const filePath = path.join(__dirname, 'public', 'MP_verify_fXlWdCzWOutXlUjk.txt');
+        fs.readFile(filePath, (err, content) => {
+            if (err) {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not found');
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(content);
+            }
+        });
+        return;
+    }
+
     if (req.method === 'POST' && req.url === '/log') {
         let body = '';
 
@@ -90,7 +106,7 @@ const server = http.createServer(async (req, res) => {
 
         console.log(`Fetching shareConfig for date: ${date}, index: ${index}`);  // Log
 
-        const shareConfig = getShareConfigByDateAndIndex(date, index);
+        const shareConfig = getShareConfigByDateAndIndex(defaultDate, defaultIndex);
         if (shareConfig) {
             // 将HTML模板插入数据
             fs.readFile(path.join(__dirname, 'index.html'), 'utf-8', (err, html) => {
@@ -214,6 +230,7 @@ const server = http.createServer(async (req, res) => {
             contentType = 'text/html';
             break;
     }
+
 
     fs.readFile(filePath, (err, content) => {
         if (err) {
