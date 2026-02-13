@@ -7,7 +7,7 @@ const shareConfig = {
     title: "逆袭的聊天记录", // 微信分享标题
     description: "逆袭:07.09.33.37\n逆袭:10.30.40.08\n聊天记录", // 微信分享描述
     link: `${baseUrl}/path/to/page`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/avatar1.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 13, // 序号，表示当天的第几条消息
     records: [

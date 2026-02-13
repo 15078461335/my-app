@@ -7,7 +7,7 @@ const shareConfig = {
     title: "晴天", // 微信分享标题
     description: "晴天:05.39.48.07\n晴天:26.34.27.16\n聊天记录", // 微信分享描述
     link: `${baseUrl}/path/to/page`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/avatar1.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 5, // 序号，表示当天的第几条消息
     records: [
