@@ -6,8 +6,8 @@ const shareConfig = {
     id: 6, // 唯一标识符
     title: "德玛的聊天记录", // 微信分享标题
     description: "德玛:05.39.48.07\n德玛:26.34.27.16\n聊天记录", // 微信分享描述
-    link: `${baseUrl}/path/to/page`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/avatar1.jpg`, // 使用全局域名
+    link: `/`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 6, // 序号，表示当天的第几条消息
     records: [

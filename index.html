@@ -192,34 +192,44 @@
                         timestamp: jsonData.timestamp,
                         nonceStr: jsonData.nonceStr,
                         signature: jsonData.signature,
-                        jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+                        jsApiList: [
+                            'updateAppMessageShareData',
+                            'updateTimelineShareData',
+                            'onMenuShareTimeline',
+                            'onMenuShareAppMessage'
+                        ]
                     });
 
                     wx.ready(function () {
-                        wx.onMenuShareAppMessage({
+                        const shareData = {
                             title: '{{title}}',
-                            desc: '分享描述信息',
-                            link: window.location.href,
-                            imgUrl: '{{imgUrl}}',
-                            success: function () {
-                                // 用户确认分享后执行的回调函数
-                            },
-                            cancel: function () {
-                                // 用户取消分享后执行的回调函数
-                            }
-                        });
+                            desc: '{{description}}',
+                            link: '{{shareLink}}',
+                            imgUrl: '{{imgUrl}}'
+                        };
 
-                        wx.onMenuShareTimeline({
-                            title: '{{title}}',
-                            link: window.location.href,
-                            imgUrl: '{{imgUrl}}',
-                            success: function () {
-                                // 用户确认分享后执行的回调函数
-                            },
-                            cancel: function () {
-                                // 用户取消分享后执行的回调函数
-                            }
-                        });
+                        if (typeof wx.updateAppMessageShareData === 'function') {
+                            wx.updateAppMessageShareData(shareData);
+                        }
+                        if (typeof wx.updateTimelineShareData === 'function') {
+                            wx.updateTimelineShareData({
+                                title: shareData.title,
+                                link: shareData.link,
+                                imgUrl: shareData.imgUrl
+                            });
+                        }
+
+                        // 兼容旧版微信
+                        if (typeof wx.onMenuShareAppMessage === 'function') {
+                            wx.onMenuShareAppMessage(shareData);
+                        }
+                        if (typeof wx.onMenuShareTimeline === 'function') {
+                            wx.onMenuShareTimeline({
+                                title: shareData.title,
+                                link: shareData.link,
+                                imgUrl: shareData.imgUrl
+                            });
+                        }
                     });
 
                     wx.error(function (res) {

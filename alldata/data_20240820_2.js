@@ -6,9 +6,9 @@ const shareConfig = {
     id: 2, // 唯一标识符
     title: "遥遥和阴天的逼的聊天记录", // 微信分享标题
     description: "遥遥:14.38.43各号10斤\n遥遥:18.33.44各号20斤\n聊天记录", // 微信分享描述
-    link: `${baseUrl}/path/to/page`, // 使用全局域名
+    link: `/`, // 使用全局域名
 
-    imgUrl: `${baseUrl}/images/avatar1.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
     messageDate: "18:19", // 消息日期
     sequence: 2, // 序号，表示当天的第几条消息
     records: [

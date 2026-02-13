@@ -6,8 +6,8 @@ const shareConfig = {
     id: 14, // 唯一标识符
     title: "爱情悬崖的聊天记录", // 微信分享标题
     description: "爱情悬崖:牛羊鼠兔\n爱情悬崖:狗虎龙\n聊天记录", // 微信分享描述
-    link: `${baseUrl}/path/to/page`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/avatar1.jpg`, // 使用全局域名
+    link: `/`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 14, // 序号，表示当天的第几条消息
     records: [
