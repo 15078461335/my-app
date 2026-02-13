@@ -201,12 +201,7 @@
                     });
 
                     wx.ready(function () {
-                        const shareData = {
-                            title: '{{title}}',
-                            desc: '{{description}}',
-                            link: '{{shareLink}}',
-                            imgUrl: '{{imgUrl}}'
-                        };
+                        const shareData = {{shareDataJson}};
 
                         if (typeof wx.updateAppMessageShareData === 'function') {
                             wx.updateAppMessageShareData(shareData);

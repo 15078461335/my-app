@@ -38,6 +38,15 @@ function toAbsoluteUrl(url, base) {
     return `${normalizedBase}${cleanPath}`;
 }
 
+function escapeForHtmlAttr(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r?\n/g, ' ');
+}
+
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
     try {
@@ -136,14 +145,27 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
-                const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl, normalizedBaseUrl);
-                const absoluteShareLink = toAbsoluteUrl(shareConfig.link || req.url, normalizedBaseUrl);
+                const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl || '/images/share-thumb.jpg', normalizedBaseUrl);
+                const currentPageLink = toAbsoluteUrl(req.url, normalizedBaseUrl);
+                const isPlaceholderLink = !shareConfig.link || shareConfig.link === '/' || shareConfig.link === `${normalizedBaseUrl}/`;
+                const absoluteShareLink = isPlaceholderLink
+                    ? currentPageLink
+                    : toAbsoluteUrl(shareConfig.link, normalizedBaseUrl);
+                const safeTitle = escapeForHtmlAttr(shareConfig.title);
+                const safeDescription = escapeForHtmlAttr(shareConfig.description);
+                const shareDataJson = JSON.stringify({
+                    title: shareConfig.title,
+                    desc: shareConfig.description,
+                    link: absoluteShareLink,
+                    imgUrl: absoluteImageUrl
+                }).replace(/</g, '\\u003c');
 
                 // 替换HTML中的占位符
-                html = html.replace(/{{title}}/g, shareConfig.title);
-                html = html.replace(/{{description}}/g, shareConfig.description);
+                html = html.replace(/{{title}}/g, safeTitle);
+                html = html.replace(/{{description}}/g, safeDescription);
                 html = html.replace(/{{imgUrl}}/g, absoluteImageUrl);
                 html = html.replace(/{{shareLink}}/g, absoluteShareLink);
+                html = html.replace(/{{shareDataJson}}/g, shareDataJson);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });
