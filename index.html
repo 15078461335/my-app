@@ -20,7 +20,9 @@
     <!-- 微信分享预览内容 -->
     <meta property="og:title" content="{{title}}">
     <meta property="og:description" content="{{description}}">
-    <meta property="og:image" content="http://lbwxjl.com/images/zhandianIcon.jpg">
+    <meta property="og:image" content="{{imgUrl}}">
+    <meta property="og:image:secure_url" content="{{imgUrl}}">
+    <meta property="og:url" content="{{shareLink}}">
 
     <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
 
@@ -174,7 +176,7 @@
             const url = window.location.href;  // 直接使用未经编码的URL
             console.log('Requesting signature for URL:', url);
 
-            fetch(`/api/wechat-qianming?url=${url}`)
+            fetch(`/api/wechat-qianming?url=${encodeURIComponent(url)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

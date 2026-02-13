@@ -19,6 +19,25 @@ let jsapiTicket = null;
 let accessToken = null;
 let tokenExpiresAt = 0;
 
+function normalizeBaseUrl(url) {
+    if (!url) {
+        return '';
+    }
+    return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function toAbsoluteUrl(url, base) {
+    if (!url) {
+        return '';
+    }
+    if (/^https?:\/\//i.test(url)) {
+        return url;
+    }
+    const normalizedBase = normalizeBaseUrl(base).replace(/\/+$/, '');
+    const cleanPath = url.startsWith('/') ? url : `/${url}`;
+    return `${normalizedBase}${cleanPath}`;
+}
+
 // 动态加载对应的data文件
 function getShareConfigByDateAndIndex(date, index) {
     try {
@@ -116,10 +135,15 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
 
+                const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
+                const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl, normalizedBaseUrl);
+                const absoluteShareLink = toAbsoluteUrl(shareConfig.link || req.url, normalizedBaseUrl);
+
                 // 替换HTML中的占位符
                 html = html.replace(/{{title}}/g, shareConfig.title);
                 html = html.replace(/{{description}}/g, shareConfig.description);
-                html = html.replace(/{{imgUrl}}/g, shareConfig.imgUrl);
+                html = html.replace(/{{imgUrl}}/g, absoluteImageUrl);
+                html = html.replace(/{{shareLink}}/g, absoluteShareLink);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
                 res.writeHead(200, { 'Content-Type': 'text/html' });

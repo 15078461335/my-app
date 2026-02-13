@@ -1,7 +1,7 @@
 // config.js
 
 // const baseUrl = 'http://cxeimp.online';
-const baseUrl = 'lbwxjl.com';
+const baseUrl = 'https://lbwxjl.com';
 
 
 module.exports = { baseUrl };
