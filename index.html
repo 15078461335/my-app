@@ -103,7 +103,7 @@
             margin-right: calc(20px + 40px);
             word-break: break-word;
             box-sizing: border-box;
-            text-align: justify;
+            text-align: left;
         }
 
         .no-avatar .content {
@@ -121,6 +121,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
+            const normalizeNumbers = (text) => {
+                return String(text || '')
+                    .replace(/(\d)\s+(?=\d)/g, '$1.')
+                    .replace(/\s*([,，])\s*/g, '$1')
+                    .replace(/\s{2,}/g, ' ')
+                    .trim();
+            };
 
             const container = document.getElementById('records-container');
             container.innerHTML = '';
@@ -152,7 +159,7 @@
 
                 const numbersDiv = document.createElement('div');
                 numbersDiv.className = 'numbers';
-                numbersDiv.innerText = record.numbers;
+                numbersDiv.innerText = normalizeNumbers(record.numbers);
 
                 contentDiv.appendChild(userDiv);
                 contentDiv.appendChild(numbersDiv);
