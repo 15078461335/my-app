@@ -8,7 +8,7 @@ const shareConfig = {
     description: "遥遥:14.38.43各号10斤\n遥遥:18.33.44各号20斤\n聊天记录", // 微信分享描述
     link: `/`, // 使用全局域名
 
-    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "18:19", // 消息日期
     sequence: 2, // 序号，表示当天的第几条消息
     records: [

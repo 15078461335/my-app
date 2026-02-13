@@ -7,7 +7,7 @@ const shareConfig = {
     title: "浪荡", // 微信分享标题
     description: "浪荡:三中三 01-17-45\n浪荡:01-19-24\n聊天记录", // 微信分享描述
     link: `/`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 4, // 序号，表示当天的第几条消息
     records: [

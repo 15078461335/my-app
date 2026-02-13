@@ -145,7 +145,7 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
-                const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl || '/images/share-thumb.jpg', normalizedBaseUrl);
+                const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl || '/images/zhandianIcon.jpg', normalizedBaseUrl);
                 const currentPageLink = toAbsoluteUrl(req.url, normalizedBaseUrl);
                 const isPlaceholderLink = !shareConfig.link || shareConfig.link === '/' || shareConfig.link === `${normalizedBaseUrl}/`;
                 const absoluteShareLink = isPlaceholderLink

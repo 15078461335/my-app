@@ -7,7 +7,7 @@ const shareConfig = {
     title: "逆迹的聊天记录", // 微信分享标题
     description: "逆迹:兔牛猪羊\n逆迹:04-46-18\n聊天记录", // 微信分享描述
     link: `/`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 9, // 序号，表示当天的第几条消息
     records: [

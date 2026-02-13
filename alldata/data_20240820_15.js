@@ -7,7 +7,7 @@ const shareConfig = {
     title: "忍者的聊天记录", // 微信分享标题
     description: "忍者:牛羊鼠兔\n忍者:狗虎龙\n聊天记录", // 微信分享描述
     link: `/`, // 使用全局域名
-    imgUrl: `${baseUrl}/images/share-thumb.jpg`, // 使用全局域名
+    imgUrl: `${baseUrl}/images/zhandianIcon.jpg`, // 使用全局域名
     messageDate: "21:19", // 消息日期
     sequence: 15, // 序号，表示当天的第几条消息
     records: [
