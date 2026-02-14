@@ -51,8 +51,21 @@ function escapeForHtmlAttr(text) {
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\r?\n/g, ' ');
+        .replace(/>/g, '&gt;');
+}
+
+function toMetaAttrMultiline(text) {
+    return escapeForHtmlAttr(text).replace(/\r?\n/g, '&#10;');
+}
+
+function buildShareDescription(shareConfig) {
+    if (Array.isArray(shareConfig.records) && shareConfig.records.length > 0) {
+        return shareConfig.records
+            .slice(0, 4)
+            .map((record) => `${record.user || ''}:${String(record.numbers || '').trim()}`)
+            .join('\n');
+    }
+    return String(shareConfig.description || '').replace(/\r?\n聊天记录\s*$/g, '').trim();
 }
 
 function getRequestPath(req) {
@@ -221,11 +234,12 @@ const server = http.createServer(async (req, res) => {
                 const absoluteShareLink = isPlaceholderLink
                     ? currentPageLink
                     : toAbsoluteUrl(shareConfig.link, normalizedBaseUrl);
+                const shareDescription = buildShareDescription(shareConfig);
                 const safeTitle = escapeForHtmlAttr(shareConfig.title);
-                const safeDescription = escapeForHtmlAttr(shareConfig.description);
+                const safeDescription = toMetaAttrMultiline(shareDescription);
                 const shareDataJson = JSON.stringify({
                     title: shareConfig.title,
-                    desc: shareConfig.description,
+                    desc: shareDescription,
                     link: absoluteShareLink,
                     imgUrl: absoluteImageUrl
                 }).replace(/</g, '\\u003c');
