@@ -66,7 +66,7 @@ function toMetaAttrMultiline(text) {
 }
 
 function buildShareDescription(shareConfig) {
-    const maxLines = 3;
+    const maxLines = 2;
     const maxCharsPerLine = 24;
     const trimLine = (text) => {
         const normalized = String(text || '').replace(/\s+/g, ' ').trim();
