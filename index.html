@@ -121,61 +121,11 @@
 <body>
 
     <div class="pay-page">
-        <div id="records-container"></div>
+        <div id="records-container">{{recordsHtml}}</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const chatRecords = JSON.parse('{{records}}'); // 解析JSON字符串为对象
-            const normalizeNumbers = (text) => {
-                return String(text || '')
-                    .replace(/(\d)\s+(?=\d)/g, '$1.')
-                    .replace(/\s*([,，])\s*/g, '$1')
-                    .replace(/\s{2,}/g, ' ')
-                    .trim();
-            };
-
-            const container = document.getElementById('records-container');
-            container.innerHTML = '';
-
-            let lastUser = '';
-
-            chatRecords.forEach((record) => {
-                const recordDiv = document.createElement('div');
-                recordDiv.className = 'record';
-
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'content';
-
-                if (record.user !== lastUser) {
-                    const avatarImg = document.createElement('img');
-                    avatarImg.className = 'avatar';
-                    avatarImg.src = record.avatar;
-                    recordDiv.appendChild(avatarImg);
-                } else {
-                    recordDiv.classList.add('no-avatar');
-                }
-
-                const userDiv = document.createElement('div');
-                userDiv.className = 'user';
-                userDiv.innerHTML = `
-                <span>${record.user}</span>
-                <span class="time">${record.time}</span>
-            `;
-
-                const numbersDiv = document.createElement('div');
-                numbersDiv.className = 'numbers';
-                numbersDiv.innerText = normalizeNumbers(record.numbers);
-
-                contentDiv.appendChild(userDiv);
-                contentDiv.appendChild(numbersDiv);
-
-                recordDiv.appendChild(contentDiv);
-                container.appendChild(recordDiv);
-
-                lastUser = record.user;
-            });
-
             // 微信签名逻辑
             const url = window.location.href;  // 直接使用未经编码的URL
             console.log('Requesting signature for URL:', url);

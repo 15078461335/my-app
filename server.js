@@ -54,6 +54,13 @@ function escapeForHtmlAttr(text) {
         .replace(/>/g, '&gt;');
 }
 
+function escapeForHtmlText(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 function toMetaAttrMultiline(text) {
     return escapeForHtmlAttr(text).replace(/\r?\n/g, '&#10;');
 }
@@ -70,18 +77,50 @@ function buildShareDescription(shareConfig) {
     };
 
     if (Array.isArray(shareConfig.records) && shareConfig.records.length > 0) {
-        return shareConfig.records
+        const lines = shareConfig.records
             .slice(0, maxLines)
             .map((record) => trimLine(`${record.user || ''}:${String(record.numbers || '').trim()}`))
-            .join('\n');
+            .filter(Boolean);
+        return `${lines.join('\n')}\n聊天记录`;
     }
-    return String(shareConfig.description || '')
+    const lines = String(shareConfig.description || '')
         .replace(/\r?\n聊天记录\s*$/g, '')
         .split(/\r?\n/)
         .map((line) => trimLine(line))
         .filter(Boolean)
-        .slice(0, maxLines)
-        .join('\n');
+        .slice(0, maxLines);
+    return `${lines.join('\n')}\n聊天记录`;
+}
+
+function normalizeNumbersText(text) {
+    return String(text || '')
+        .replace(/(\d)\s+(?=\d)/g, '$1.')
+        .replace(/\s*([,，])\s*/g, '$1')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+}
+
+function renderRecordsHtml(records) {
+    if (!Array.isArray(records)) {
+        return '';
+    }
+
+    let lastUser = '';
+    return records.map((record) => {
+        const currentUser = String(record.user || '');
+        const isRepeatUser = currentUser === lastUser;
+        lastUser = currentUser;
+
+        const wrapperClass = isRepeatUser ? 'record no-avatar' : 'record';
+        const avatarHtml = isRepeatUser
+            ? ''
+            : `<img class="avatar" src="${escapeForHtmlAttr(record.avatar || '')}" alt="">`;
+        const userText = escapeForHtmlText(currentUser);
+        const timeText = escapeForHtmlText(record.time || '');
+        const numbersText = escapeForHtmlText(normalizeNumbersText(record.numbers || '')).replace(/\r?\n/g, '<br>');
+
+        return `<div class="${wrapperClass}">${avatarHtml}<div class="content"><div class="user"><span>${userText}</span><span class="time">${timeText}</span></div><div class="numbers">${numbersText}</div></div></div>`;
+    }).join('');
 }
 
 function getRequestPath(req) {
@@ -251,6 +290,7 @@ const server = http.createServer(async (req, res) => {
                     ? currentPageLink
                     : toAbsoluteUrl(shareConfig.link, normalizedBaseUrl);
                 const shareDescription = buildShareDescription(shareConfig);
+                const recordsHtml = renderRecordsHtml(shareConfig.records || []);
                 const safeTitle = escapeForHtmlAttr(shareConfig.title);
                 const safeDescription = toMetaAttrMultiline(shareDescription);
                 const shareDataJson = JSON.stringify({
@@ -266,7 +306,7 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{imgUrl}}/g, absoluteImageUrl);
                 html = html.replace(/{{shareLink}}/g, absoluteShareLink);
                 html = html.replace(/{{shareDataJson}}/g, shareDataJson);
-                html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
+                html = html.replace(/{{recordsHtml}}/g, recordsHtml);
 
                 renderedPageCache.set(pageCacheKey, {
                     html,
