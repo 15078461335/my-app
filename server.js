@@ -18,6 +18,14 @@ const APP_SECRET = '65b87e58f6d7097ade75be126b2006dc';
 let jsapiTicket = null;
 let accessToken = null;
 let tokenExpiresAt = 0;
+const HTML_TEMPLATE_TTL_MS = 60 * 1000;
+const SHARE_CONFIG_TTL_MS = 5 * 60 * 1000;
+const RENDERED_PAGE_TTL_MS = 30 * 1000;
+const STATIC_ASSET_CACHE_CONTROL = 'public, max-age=604800, immutable';
+
+let htmlTemplateCache = { content: null, expiresAt: 0 };
+const shareConfigCache = new Map();
+const renderedPageCache = new Map();
 
 function normalizeBaseUrl(url) {
     if (!url) {
@@ -45,6 +53,63 @@ function escapeForHtmlAttr(text) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/\r?\n/g, ' ');
+}
+
+function getRequestPath(req) {
+    const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+    return requestUrl.pathname;
+}
+
+function getCachedShareConfig(date, index) {
+    const key = `${date}:${index}`;
+    const cached = shareConfigCache.get(key);
+    if (cached && cached.expiresAt > Date.now()) {
+        return cached.value;
+    }
+
+    const value = getShareConfigByDateAndIndex(date, index);
+    if (value) {
+        shareConfigCache.set(key, {
+            value,
+            expiresAt: Date.now() + SHARE_CONFIG_TTL_MS
+        });
+    }
+    return value;
+}
+
+function getHtmlTemplate() {
+    if (htmlTemplateCache.content && htmlTemplateCache.expiresAt > Date.now()) {
+        return htmlTemplateCache.content;
+    }
+
+    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+    htmlTemplateCache = {
+        content: html,
+        expiresAt: Date.now() + HTML_TEMPLATE_TTL_MS
+    };
+    return html;
+}
+
+function getContentTypeByExt(extname) {
+    switch (extname) {
+        case '.js':
+            return 'text/javascript';
+        case '.css':
+            return 'text/css';
+        case '.json':
+            return 'application/json';
+        case '.jpg':
+        case '.jpeg':
+            return 'image/jpeg';
+        case '.png':
+            return 'image/png';
+        case '.ico':
+            return 'image/x-icon';
+        case '.txt':
+            return 'text/plain';
+        default:
+            return 'text/html';
+    }
 }
 
 // 动态加载对应的data文件
@@ -91,9 +156,10 @@ async function getJsapiTicket() {
 
 const server = http.createServer(async (req, res) => {
     console.log(`进服务器的请求: ${req.url}`);  // Log
+    const requestPath = getRequestPath(req);
 
     // 微信公众号验证专用文件处理
-    if (req.method === 'GET' && req.url === '/MP_verify_fXlWdCzWOutXlUjk.txt') {
+    if (req.method === 'GET' && requestPath === '/MP_verify_fXlWdCzWOutXlUjk.txt') {
         const filePath = path.join(__dirname, 'public', 'MP_verify_fXlWdCzWOutXlUjk.txt');
         fs.readFile(filePath, (err, content) => {
             if (err) {
@@ -107,7 +173,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'POST' && req.url === '/log') {
+    if (req.method === 'POST' && requestPath === '/log') {
         let body = '';
 
         req.on('data', chunk => {
@@ -123,27 +189,31 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && (req.url.startsWith('/api/shareConfig') || req.url === '/')) {
+    if (req.method === 'GET' && (requestPath === '/api/shareConfig' || requestPath === '/')) {
         // 默认的 date 和 index
         const defaultDate = '20240820';
         const defaultIndex = '2';
 
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
-        const date = req.url === '/' ? defaultDate : requestUrl.searchParams.get('date');
-        const index = req.url === '/' ? defaultIndex : requestUrl.searchParams.get('index');
+        const date = requestPath === '/' ? defaultDate : (requestUrl.searchParams.get('date') || defaultDate);
+        const index = requestPath === '/' ? defaultIndex : (requestUrl.searchParams.get('index') || defaultIndex);
+        const pageCacheKey = `${date}:${index}:${req.url}`;
+        const cachedPage = renderedPageCache.get(pageCacheKey);
+        if (cachedPage && cachedPage.expiresAt > Date.now()) {
+            res.writeHead(200, {
+                'Content-Type': 'text/html; charset=utf-8',
+                'Cache-Control': 'no-cache'
+            });
+            res.end(cachedPage.html);
+            return;
+        }
 
         console.log(`Fetching shareConfig for date: ${date}, index: ${index}`);  // Log
 
-        const shareConfig = getShareConfigByDateAndIndex(defaultDate, defaultIndex);
+        const shareConfig = getCachedShareConfig(date, index);
         if (shareConfig) {
-            // 将HTML模板插入数据
-            fs.readFile(path.join(__dirname, 'index.html'), 'utf-8', (err, html) => {
-                if (err) {
-                    res.writeHead(500, { 'Content-Type': 'text/html' });
-                    res.end('Server Error');
-                    return;
-                }
-
+            try {
+                let html = getHtmlTemplate();
                 const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
                 const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl || '/images/zhandianIcon.jpg', normalizedBaseUrl);
                 const currentPageLink = toAbsoluteUrl(req.url, normalizedBaseUrl);
@@ -168,9 +238,21 @@ const server = http.createServer(async (req, res) => {
                 html = html.replace(/{{shareDataJson}}/g, shareDataJson);
                 html = html.replace(/{{records}}/g, JSON.stringify(shareConfig.records).replace(/\"/g, '\\"')); // 转义字符串中的双引号
 
-                res.writeHead(200, { 'Content-Type': 'text/html' });
+                renderedPageCache.set(pageCacheKey, {
+                    html,
+                    expiresAt: Date.now() + RENDERED_PAGE_TTL_MS
+                });
+
+                res.writeHead(200, {
+                    'Content-Type': 'text/html; charset=utf-8',
+                    'Cache-Control': 'no-cache'
+                });
                 res.end(html);
-            });
+            } catch (err) {
+                console.error('Render page failed:', err);
+                res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
+                res.end('Server Error');
+            }
         } else {
             res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: 'Data not found' }));
@@ -178,7 +260,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.startsWith('/api/wechat-qianming')) {
+    if (req.method === 'GET' && requestPath === '/api/wechat-qianming') {
         console.log('微信签名请求 api/wechat-qianming');
         console.log('Before:', req.url);
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
@@ -210,7 +292,7 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.includes('signature')) {
+    if (req.method === 'GET' && requestPath.includes('signature')) {
         const requestUrl = new URL(req.url, `http://${req.headers.host}`);
         const signature = requestUrl.searchParams.get('signature');
         const timestamp = requestUrl.searchParams.get('timestamp');
@@ -248,41 +330,43 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    const filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+    const normalizedPath = requestPath === '/' ? '/index.html' : requestPath;
+    const filePath = path.join(__dirname, normalizedPath);
     const extname = path.extname(filePath);
-    let contentType = 'text/html';
+    const contentType = getContentTypeByExt(extname);
+    const isStaticAsset = ['.js', '.css', '.jpg', '.jpeg', '.png', '.ico', '.txt'].includes(extname);
 
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.json':
-            contentType = 'application/json';
-            break;
-        case '.jpg':
-        case '.jpeg':
-            contentType = 'image/jpeg';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;
-        case '.ico':
-            contentType = 'image/x-icon';
-            break;
-        default:
-            contentType = 'text/html';
-            break;
-    }
+    fs.stat(filePath, (statErr, stats) => {
+        if (statErr) {
+            if (statErr.code === 'ENOENT') {
+                fs.readFile(path.join(__dirname, '404.html'), (error, content404) => {
+                    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+                    res.end(content404 || 'Not Found', 'utf-8');
+                });
+                return;
+            }
+            res.writeHead(500);
+            res.end(`Server Error: ${statErr.code}`);
+            return;
+        }
 
+        const etag = `W/"${stats.size}-${Number(stats.mtimeMs)}"`;
+        const ifNoneMatch = req.headers['if-none-match'];
+        if (ifNoneMatch && ifNoneMatch === etag) {
+            res.writeHead(304, {
+                ETag: etag,
+                'Last-Modified': stats.mtime.toUTCString(),
+                'Cache-Control': isStaticAsset ? STATIC_ASSET_CACHE_CONTROL : 'no-cache'
+            });
+            res.end();
+            return;
+        }
 
-    fs.readFile(filePath, (err, content) => {
+        fs.readFile(filePath, (err, content) => {
         if (err) {
             if (err.code == 'ENOENT') {
                 fs.readFile(path.join(__dirname, '404.html'), (error, content404) => {
-                    res.writeHead(404, { 'Content-Type': 'text/html' });
+                    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
                     res.end(content404, 'utf-8');
                 });
             } else {
@@ -290,9 +374,16 @@ const server = http.createServer(async (req, res) => {
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
+            const headers = {
+                'Content-Type': contentType,
+                ETag: etag,
+                'Last-Modified': stats.mtime.toUTCString(),
+                'Cache-Control': isStaticAsset ? STATIC_ASSET_CACHE_CONTROL : 'no-cache'
+            };
+            res.writeHead(200, headers);
             res.end(content, 'utf-8');
         }
+    });
     });
 });
 
