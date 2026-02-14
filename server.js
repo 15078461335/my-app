@@ -284,10 +284,10 @@ const server = http.createServer(async (req, res) => {
                 let html = getHtmlTemplate();
                 const normalizedBaseUrl = normalizeBaseUrl(baseUrl);
                 const absoluteImageUrl = toAbsoluteUrl(shareConfig.imgUrl || '/images/zhandianIcon.jpg', normalizedBaseUrl);
-                const currentPageLink = toAbsoluteUrl(req.url, normalizedBaseUrl);
+                const canonicalShareLink = `${normalizedBaseUrl.replace(/\/+$/, '')}/`;
                 const isPlaceholderLink = !shareConfig.link || shareConfig.link === '/' || shareConfig.link === `${normalizedBaseUrl}/`;
                 const absoluteShareLink = isPlaceholderLink
-                    ? currentPageLink
+                    ? canonicalShareLink
                     : toAbsoluteUrl(shareConfig.link, normalizedBaseUrl);
                 const shareDescription = buildShareDescription(shareConfig);
                 const recordsHtml = renderRecordsHtml(shareConfig.records || []);
