@@ -59,13 +59,29 @@ function toMetaAttrMultiline(text) {
 }
 
 function buildShareDescription(shareConfig) {
+    const maxLines = 3;
+    const maxCharsPerLine = 24;
+    const trimLine = (text) => {
+        const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+        if (normalized.length <= maxCharsPerLine) {
+            return normalized;
+        }
+        return `${normalized.slice(0, maxCharsPerLine - 1)}…`;
+    };
+
     if (Array.isArray(shareConfig.records) && shareConfig.records.length > 0) {
         return shareConfig.records
-            .slice(0, 4)
-            .map((record) => `${record.user || ''}:${String(record.numbers || '').trim()}`)
+            .slice(0, maxLines)
+            .map((record) => trimLine(`${record.user || ''}:${String(record.numbers || '').trim()}`))
             .join('\n');
     }
-    return String(shareConfig.description || '').replace(/\r?\n聊天记录\s*$/g, '').trim();
+    return String(shareConfig.description || '')
+        .replace(/\r?\n聊天记录\s*$/g, '')
+        .split(/\r?\n/)
+        .map((line) => trimLine(line))
+        .filter(Boolean)
+        .slice(0, maxLines)
+        .join('\n');
 }
 
 function getRequestPath(req) {
